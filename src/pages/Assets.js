@@ -12,6 +12,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import AssetsSummaryTiles from "../components/assets/AssetsSummaryTiles";
 import AssetCostChart from "../components/assets/AssetCostChart";
+import AssetsDashboard from "../components/assets/AssetsDashboard";
 import AssetsTable from "../components/assets/AssetsTable";
 import { windowOptions, assetTypeTabs } from "../components/assets/tokens";
 import AssetsService from "../services/assets";
@@ -35,6 +36,7 @@ const Assets = React.memo(() => {
   const [currency] = useState("USD");
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [viewMode, setViewMode] = useState("table"); // "table" or "dashboard"
   const mounted = useRef(true);
 
   // Update URL params without full re-render
@@ -123,6 +125,42 @@ const Assets = React.memo(() => {
     <Page>
       <Header headerTitle="Assets">
         <div className="assets-header-controls">
+          {/* View mode toggle */}
+          <div className="assets-view-toggle">
+            <button
+              className={`view-toggle-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => setViewMode("table")}
+              title="Table view"
+            >
+              <svg
+                viewBox="0 0 16 16"
+                width="14"
+                height="14"
+                fill="currentColor"
+              >
+                <path d="M1 2.5A1.5 1.5 0 012.5 1h11A1.5 1.5 0 0115 2.5v11a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 13.5v-11zM2.5 2a.5.5 0 00-.5.5V5h12V2.5a.5.5 0 00-.5-.5h-11zM14 6H2v3h12V6zm0 4H2v3.5a.5.5 0 00.5.5h11a.5.5 0 00.5-.5V10z" />
+              </svg>
+              <span>Table</span>
+            </button>
+            <button
+              className={`view-toggle-btn ${viewMode === "dashboard" ? "active" : ""}`}
+              onClick={() => setViewMode("dashboard")}
+              title="Dashboard visualizations"
+            >
+              <svg
+                viewBox="0 0 16 16"
+                width="14"
+                height="14"
+                fill="currentColor"
+              >
+                <path d="M0 1.5A1.5 1.5 0 011.5 0h3A1.5 1.5 0 016 1.5v3A1.5 1.5 0 014.5 6h-3A1.5 1.5 0 010 4.5v-3zm6.5 0A1.5 1.5 0 018 0h3a1.5 1.5 0 011.5 1.5v3A1.5 1.5 0 0111 6H8a1.5 1.5 0 01-1.5-1.5v-3zM0 8a1.5 1.5 0 011.5-1.5h3A1.5 1.5 0 016 8v3a1.5 1.5 0 01-1.5 1.5h-3A1.5 1.5 0 010 11V8zm6.5 0A1.5 1.5 0 018 6.5h3A1.5 1.5 0 0112.5 8v3a1.5 1.5 0 01-1.5 1.5H8A1.5 1.5 0 016.5 11V8z" />
+              </svg>
+              <span>Visualizations</span>
+            </button>
+          </div>
+
+          <div className="assets-header-divider" />
+
           <select
             value={windowParam}
             onChange={(e) => updateParams({ window: e.target.value })}
@@ -186,36 +224,50 @@ const Assets = React.memo(() => {
             {/* Cost summary tiles */}
             <AssetsSummaryTiles assets={assets} currency={currency} />
 
-            {/* Cost over time chart */}
-            <AssetCostChart
-              assets={assets}
-              currency={currency}
-              windowStr={windowParam}
-            />
+            {viewMode === "dashboard" ? (
+              /* ── Full dashboard visualizations ── */
+              <AssetsDashboard
+                assets={assets}
+                currency={currency}
+                windowStr={windowParam}
+              />
+            ) : (
+              /* ── Table view (default) ── */
+              <>
+                {/* Cost over time chart */}
+                <AssetCostChart
+                  assets={assets}
+                  currency={currency}
+                  windowStr={windowParam}
+                />
 
-            {/* Filter pills */}
-            <div className="assets-filter-bar">
-              {assetTypeTabs
-                .filter((t) => t.key === "all" || (typeCounts[t.key] || 0) > 0)
-                .map((t) => (
-                  <button
-                    key={t.key}
-                    className={`assets-filter-btn ${tabParam === t.key ? "active" : ""}`}
-                    onClick={() => updateParams({ tab: t.key })}
-                  >
-                    {t.label}
-                    <span className="filter-count">
-                      {typeCounts[t.key] || 0}
-                    </span>
-                  </button>
-                ))}
-            </div>
+                {/* Filter pills */}
+                <div className="assets-filter-bar">
+                  {assetTypeTabs
+                    .filter(
+                      (t) => t.key === "all" || (typeCounts[t.key] || 0) > 0,
+                    )
+                    .map((t) => (
+                      <button
+                        key={t.key}
+                        className={`assets-filter-btn ${tabParam === t.key ? "active" : ""}`}
+                        onClick={() => updateParams({ tab: t.key })}
+                      >
+                        {t.label}
+                        <span className="filter-count">
+                          {typeCounts[t.key] || 0}
+                        </span>
+                      </button>
+                    ))}
+                </div>
 
-            <AssetsTable
-              assets={filteredAssets}
-              currency={currency}
-              windowStr={windowParam}
-            />
+                <AssetsTable
+                  assets={filteredAssets}
+                  currency={currency}
+                  windowStr={windowParam}
+                />
+              </>
+            )}
 
             {lastUpdated && (
               <div className="assets-last-updated">

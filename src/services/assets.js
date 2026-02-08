@@ -1,11 +1,49 @@
 import client from "./api_client";
 
 /**
+ * Generates per-day mock cost snapshots for an asset over a date range.
+ * Returns array of { date: "2026-02-01", cost, cpuCost, ramCost, ... }
+ * This lets the dashboard charts display real timestamped data.
+ */
+function generateDailySnapshots(totalCost, days, startDate, extra = {}) {
+  const snapshots = [];
+  const base = totalCost / days;
+  for (let i = 0; i < days; i++) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i);
+    // Deterministic daily variance using a simple sine wave
+    const variance =
+      1 + Math.sin(i * 1.8 + days) * 0.18 + Math.cos(i * 0.7) * 0.08;
+    const dayCost = Math.max(0, base * variance);
+    const snap = {
+      date: d.toISOString().slice(0, 10),
+      cost: Number(dayCost.toFixed(4)),
+    };
+    // Spread cost sub-components proportionally
+    if (extra.cpuCost)
+      snap.cpuCost = Number(((extra.cpuCost / days) * variance).toFixed(4));
+    if (extra.ramCost)
+      snap.ramCost = Number(((extra.ramCost / days) * variance).toFixed(4));
+    if (extra.gpuCost)
+      snap.gpuCost = Number(((extra.gpuCost / days) * variance).toFixed(4));
+    snapshots.push(snap);
+  }
+  return snapshots;
+}
+
+/**
  * Mock asset data matching the real /assets API response format.
  * Covers all 6 asset types: Node, Disk, LoadBalancer, Network, Cloud, ClusterManagement.
  * Structure mirrors: https://www.opencost.io/docs/integrations/api-examples#assets-example
+ *
+ * Each asset now includes a `dailyCosts` array with timestamped cost data for charts.
  */
 function getMockAssets() {
+  const winStart = "2026-02-01T00:00:00Z";
+  const winEnd = "2026-02-08T00:00:00Z";
+  const startD = new Date(winStart);
+  const days = 7;
+
   return {
     "GCP/__undefined__/demo-project/Compute/demo-cluster/Node/Kubernetes/gke-demo-pool-a1b2c3d4-x1y2/gke-demo-pool-a1b2c3d4-x1y2":
       {
@@ -28,9 +66,9 @@ function getMockAssets() {
           topology_kubernetes_io_zone: "us-central1-a",
           cloud_google_com_gke_nodepool: "demo-pool",
         },
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         nodeType: "e2-medium",
         pool: "demo-pool",
@@ -54,6 +92,10 @@ function getMockAssets() {
           ramOverheadFraction: 0.09,
           overheadCostFraction: 0.075,
         },
+        dailyCosts: generateDailySnapshots(12.35, days, startD, {
+          cpuCost: 8.42,
+          ramCost: 4.18,
+        }),
       },
     "GCP/__undefined__/demo-project/Compute/demo-cluster/Node/Kubernetes/gke-demo-pool-e5f6g7h8-a3b4/gke-demo-pool-e5f6g7h8-a3b4":
       {
@@ -76,9 +118,9 @@ function getMockAssets() {
           topology_kubernetes_io_zone: "us-central1-b",
           cloud_google_com_gke_nodepool: "demo-pool",
         },
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         nodeType: "e2-standard-4",
         pool: "demo-pool",
@@ -102,6 +144,10 @@ function getMockAssets() {
           ramOverheadFraction: 0.07,
           overheadCostFraction: 0.055,
         },
+        dailyCosts: generateDailySnapshots(33.06, days, startD, {
+          cpuCost: 16.84,
+          ramCost: 16.72,
+        }),
       },
     "AWS/__undefined__/prod-account/Compute/prod-cluster/Node/Kubernetes/ip-10-0-1-42.ec2.internal/ip-10-0-1-42.ec2.internal":
       {
@@ -124,9 +170,9 @@ function getMockAssets() {
           topology_kubernetes_io_zone: "us-east-1a",
           eks_amazonaws_com_nodegroup: "prod-workers",
         },
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         nodeType: "m5.xlarge",
         pool: "prod-workers",
@@ -150,6 +196,10 @@ function getMockAssets() {
           ramOverheadFraction: 0.08,
           overheadCostFraction: 0.065,
         },
+        dailyCosts: generateDailySnapshots(40.82, days, startD, {
+          cpuCost: 22.68,
+          ramCost: 18.14,
+        }),
       },
     "GCP/__undefined__/demo-project/Storage/demo-cluster/Disk/Kubernetes/pvc-abc123/pvc-abc123":
       {
@@ -164,9 +214,9 @@ function getMockAssets() {
           providerID: "pvc-abc123",
         },
         labels: {},
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         byteHours: 1443109011456,
         bytes: 10737418240,
@@ -180,6 +230,7 @@ function getMockAssets() {
         claimName: "prometheus-server",
         claimNamespace: "prometheus-system",
         local: 0,
+        dailyCosts: generateDailySnapshots(1.47, days, startD),
       },
     "GCP/__undefined__/demo-project/Storage/demo-cluster/Disk/Kubernetes/pvc-def456/pvc-def456":
       {
@@ -194,9 +245,9 @@ function getMockAssets() {
           providerID: "pvc-def456",
         },
         labels: {},
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         byteHours: 5772436045824,
         bytes: 53687091200,
@@ -210,6 +261,7 @@ function getMockAssets() {
         claimName: "data-postgres-0",
         claimNamespace: "database",
         local: 0,
+        dailyCosts: generateDailySnapshots(5.88, days, startD),
       },
     "AWS/__undefined__/prod-account/Network/prod-cluster/LoadBalancer/Kubernetes/ab1234-elb/ab1234-elb":
       {
@@ -224,14 +276,15 @@ function getMockAssets() {
           providerID: "ab1234-elb",
         },
         labels: {},
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         adjustment: 0,
         totalCost: 18.14,
         private: false,
         ip: "52.14.23.189",
+        dailyCosts: generateDailySnapshots(18.14, days, startD),
       },
     "GCP/__undefined__/demo-project/Network/demo-cluster/Network/Kubernetes/__unmounted__/__unmounted__":
       {
@@ -246,12 +299,13 @@ function getMockAssets() {
           providerID: "__unmounted__",
         },
         labels: {},
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         adjustment: 0,
         totalCost: 2.34,
+        dailyCosts: generateDailySnapshots(2.34, days, startD),
       },
     "GCP/__undefined__/demo-project/Management/demo-cluster/ClusterManagement/Kubernetes/demo-cluster/demo-cluster":
       {
@@ -266,12 +320,13 @@ function getMockAssets() {
           providerID: "demo-cluster",
         },
         labels: {},
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         adjustment: 0,
         totalCost: 24.36,
+        dailyCosts: generateDailySnapshots(24.36, days, startD),
       },
     "AWS/__undefined__/prod-account/Other/prod-cluster/Cloud/AWS/nat-gateway-prod/nat-gateway-prod":
       {
@@ -286,13 +341,14 @@ function getMockAssets() {
           providerID: "nat-gateway-prod",
         },
         labels: {},
-        window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
-        start: "2026-02-01T00:00:00Z",
-        end: "2026-02-08T00:00:00Z",
+        window: { start: winStart, end: winEnd },
+        start: winStart,
+        end: winEnd,
         minutes: 10080,
         adjustment: 0,
         credit: -1.25,
         totalCost: 6.72,
+        dailyCosts: generateDailySnapshots(6.72, days, startD),
       },
   };
 }
