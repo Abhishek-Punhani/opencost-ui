@@ -42,7 +42,7 @@ const AssetsSummaryTiles = ({ assets, currency }) => {
     {
       label: "RAM Cost",
       value: toCurrency(metrics.ramCost, currency),
-      accent: "#009d9a",
+      accent: "#007d79",
     },
     {
       label: "GPU Cost",
@@ -53,13 +53,13 @@ const AssetsSummaryTiles = ({ assets, currency }) => {
     {
       label: "Storage Cost",
       value: toCurrency(metrics.storageCost, currency),
-      accent: "#1192e8",
+      accent: "#0072c4",
       hide: metrics.storageCost === 0,
     },
     {
       label: "Total Assets",
       value: String(assets.length),
-      accent: "#6f6f6f",
+      accent: "#525252",
     },
   ].filter((t) => !t.hide);
 
@@ -67,10 +67,10 @@ const AssetsSummaryTiles = ({ assets, currency }) => {
     <div className="cost-tiles-row">
       {tiles.map((tile) => (
         <div key={tile.label} className="cost-tile">
+          <span className="cost-tile-label">{tile.label}</span>
           <span className="cost-tile-value" style={{ color: tile.accent }}>
             {tile.value}
           </span>
-          <span className="cost-tile-label">{tile.label}</span>
         </div>
       ))}
     </div>
