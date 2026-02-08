@@ -14,43 +14,82 @@ import {
 import { toCurrency } from "../../util";
 
 /**
- * Generates synthetic daily cost breakdown from aggregated asset data.
- * When real per-day data is available from the API, swap this out.
+ * Builds daily cost breakdown from asset dailyCosts arrays.
+ * Falls back to synthetic generation if dailyCosts not available.
+ * Always shows at least 7 data points so charts are never a single bar.
  */
 function generateDailyBreakdown(assets, windowStr) {
-  const windowDays = {
-    today: 1,
-    yesterday: 1,
-    "24h": 1,
-    "48h": 2,
-    week: 7,
-    lastweek: 7,
-    "7d": 7,
-    "14d": 14,
-  };
+  const types = new Set();
+  const dateMap = {};
 
-  const days = windowDays[windowStr] || 7;
-  const now = new Date();
-
-  // Aggregate costs by type
-  const typeCosts = {};
-  let totalCost = 0;
+  // Try to use real dailyCosts from assets
+  let hasDailyCosts = false;
   assets.forEach((a) => {
     const type = a.type || "Other";
-    typeCosts[type] = (typeCosts[type] || 0) + (a.totalCost || 0);
-    totalCost += a.totalCost || 0;
+    types.add(type);
+    if (a.dailyCosts && a.dailyCosts.length > 0) {
+      hasDailyCosts = true;
+      a.dailyCosts.forEach((dc) => {
+        if (!dateMap[dc.date]) dateMap[dc.date] = {};
+        dateMap[dc.date][type] = (dateMap[dc.date][type] || 0) + dc.cost;
+      });
+    }
   });
 
-  const dailyCost = totalCost / days;
-  const types = Object.keys(typeCosts);
+  const typeArr = [...types].sort();
 
-  // Generate daily data points
+  if (hasDailyCosts && Object.keys(dateMap).length > 0) {
+    const dates = Object.keys(dateMap).sort();
+    const data = dates.map((d) => {
+      const point = {
+        date: d,
+        dateLabel: new Date(d + "T00:00:00Z").toLocaleDateString(
+          navigator.language,
+          {
+            month: "short",
+            day: "numeric",
+            timeZone: "UTC",
+          },
+        ),
+      };
+      let total = 0;
+      typeArr.forEach((t) => {
+        point[t] = Number((dateMap[d][t] || 0).toFixed(4));
+        total += point[t];
+      });
+      point.total = Number(total.toFixed(4));
+      return point;
+    });
+    return { data, types: typeArr };
+  }
+
+  // Synthetic fallback — always at least 7 days
+  const days = Math.max(
+    7,
+    {
+      today: 7,
+      yesterday: 7,
+      "24h": 7,
+      "48h": 7,
+      week: 7,
+      lastweek: 7,
+      "7d": 7,
+      "14d": 14,
+    }[windowStr] || 7,
+  );
+
+  const typeCosts = {};
+  assets.forEach((a) => {
+    const t = a.type || "Other";
+    typeCosts[t] = (typeCosts[t] || 0) + (a.totalCost || 0);
+  });
+
+  const now = new Date();
   const data = [];
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(now);
     date.setDate(date.getDate() - i);
     date.setHours(0, 0, 0, 0);
-
     const point = {
       date: date.toISOString(),
       dateLabel: date.toLocaleDateString(navigator.language, {
@@ -59,22 +98,17 @@ function generateDailyBreakdown(assets, windowStr) {
         timeZone: "UTC",
       }),
     };
-
-    // Distribute cost per type with slight daily variance
     let dayTotal = 0;
-    types.forEach((type) => {
-      const typeDailyCost = typeCosts[type] / days;
-      // Apply a small deterministic variance based on day index
-      const variance = 1 + Math.sin(i * 1.5 + types.indexOf(type)) * 0.15;
-      const cost = Math.max(0, typeDailyCost * variance);
+    typeArr.forEach((type) => {
+      const v = 1 + Math.sin(i * 1.5 + typeArr.indexOf(type)) * 0.15;
+      const cost = Math.max(0, ((typeCosts[type] || 0) / days) * v);
       point[type] = Number(cost.toFixed(4));
       dayTotal += point[type];
     });
     point.total = Number(dayTotal.toFixed(4));
     data.push(point);
   }
-
-  return { data, types };
+  return { data, types: typeArr };
 }
 
 /**

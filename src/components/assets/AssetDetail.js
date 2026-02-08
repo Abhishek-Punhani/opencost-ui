@@ -182,21 +182,28 @@ const CostDonut = ({ asset, currency }) => {
 };
 
 /**
- * Simulated daily cost trend for this single asset.
+ * Daily cost trend for a single asset.
+ * Uses real dailyCosts when available, otherwise generates 7-day synthetic data.
  */
 const AssetCostTrend = ({ asset, currency, windowStr }) => {
   const data = useMemo(() => {
-    const windowDays = {
-      today: 1,
-      yesterday: 1,
-      "24h": 1,
-      "48h": 2,
-      week: 7,
-      lastweek: 7,
-      "7d": 7,
-      "14d": 14,
-    };
-    const days = windowDays[windowStr] || 7;
+    // Use real timestamped dailyCosts if available
+    if (asset.dailyCosts && asset.dailyCosts.length > 1) {
+      return asset.dailyCosts.map((dc) => ({
+        date: new Date(dc.date + "T00:00:00Z").toLocaleDateString(
+          navigator.language,
+          {
+            month: "short",
+            day: "numeric",
+            timeZone: "UTC",
+          },
+        ),
+        cost: dc.cost,
+      }));
+    }
+
+    // Synthetic fallback — always at least 7 days
+    const days = 7;
     const dailyCost = (asset.totalCost || 0) / days;
     const now = new Date();
 
