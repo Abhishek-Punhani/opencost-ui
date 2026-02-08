@@ -1,14 +1,23 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import Page from "../components/Page";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import AssetsSummaryTiles from "../components/assets/AssetsSummaryTiles";
+import AssetCostChart from "../components/assets/AssetCostChart";
 import AssetsTable from "../components/assets/AssetsTable";
 import { windowOptions, assetTypeTabs } from "../components/assets/tokens";
 import AssetsService from "../services/assets";
 import "../css/assets.css";
+
+const REFRESH_INTERVAL = 60000; // 60 seconds
 
 const Assets = React.memo(() => {
   const routerLocation = useLocation();
@@ -24,6 +33,8 @@ const Assets = React.memo(() => {
   const [loading, setLoading] = useState(true);
   const [isMock, setIsMock] = useState(false);
   const [currency] = useState("USD");
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const mounted = useRef(true);
 
   // Update URL params without full re-render
@@ -41,18 +52,14 @@ const Assets = React.memo(() => {
     });
   };
 
-  // Fetch assets when window changes
-  useEffect(() => {
-    mounted.current = true;
-
-    async function fetchData() {
-      setLoading(true);
+  // Fetch assets
+  const fetchData = useCallback(
+    async (showLoading = true) => {
+      if (showLoading) setLoading(true);
       try {
         const result = await AssetsService.fetchAssets(windowParam);
         if (!mounted.current) return;
 
-        // The API returns { code, data: [ { assetKey: assetObj, ... } ] }
-        // Convert the flat object into an array with _id set from the key
         const raw = result.data;
         let parsed = [];
         if (raw && raw.data && Array.isArray(raw.data) && raw.data.length > 0) {
@@ -65,6 +72,7 @@ const Assets = React.memo(() => {
 
         setAssets(parsed);
         setIsMock(result.isMock);
+        setLastUpdated(new Date());
       } catch (err) {
         if (!mounted.current) return;
         console.error("Failed to fetch assets:", err);
@@ -72,14 +80,25 @@ const Assets = React.memo(() => {
       } finally {
         if (mounted.current) setLoading(false);
       }
-    }
+    },
+    [windowParam],
+  );
 
+  // Initial fetch and window change
+  useEffect(() => {
+    mounted.current = true;
     fetchData();
-
     return () => {
       mounted.current = false;
     };
-  }, [windowParam]);
+  }, [fetchData]);
+
+  // Auto-refresh interval
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const timer = setInterval(() => fetchData(false), REFRESH_INTERVAL);
+    return () => clearInterval(timer);
+  }, [autoRefresh, fetchData]);
 
   // Filter assets by the active tab
   const filteredAssets = useMemo(() => {
@@ -98,38 +117,42 @@ const Assets = React.memo(() => {
     return counts;
   }, [assets]);
 
-  // Find selected window option for dropdown
-  const selectedWindow = useMemo(
-    () =>
-      windowOptions.find((w) => w.value === windowParam) || windowOptions[0],
-    [windowParam],
-  );
-
   const [showNotif, setShowNotif] = useState(true);
 
   return (
     <Page>
       <Header headerTitle="Assets">
-        <select
-          value={windowParam}
-          onChange={(e) => updateParams({ window: e.target.value })}
-          style={{
-            border: "1px solid #d0d5dd",
-            borderRadius: 4,
-            padding: "6px 12px",
-            fontSize: "0.8125rem",
-            fontFamily: "inherit",
-            color: "#161616",
-            background: "#fff",
-            cursor: "pointer",
-          }}
-        >
-          {windowOptions.map((w) => (
-            <option key={w.value} value={w.value}>
-              {w.name}
-            </option>
-          ))}
-        </select>
+        <div className="assets-header-controls">
+          <select
+            value={windowParam}
+            onChange={(e) => updateParams({ window: e.target.value })}
+            className="assets-window-select"
+          >
+            {windowOptions.map((w) => (
+              <option key={w.value} value={w.value}>
+                {w.name}
+              </option>
+            ))}
+          </select>
+          <label
+            className="assets-refresh-toggle"
+            title="Auto-refresh every 60s"
+          >
+            <input
+              type="checkbox"
+              checked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+            />
+            <span className="refresh-label">Auto-refresh</span>
+          </label>
+          <button
+            className="assets-refresh-btn"
+            onClick={() => fetchData(true)}
+            title="Refresh now"
+          >
+            ↻
+          </button>
+        </div>
       </Header>
 
       <div className="assets-page">
@@ -160,14 +183,17 @@ const Assets = React.memo(() => {
           </div>
         ) : (
           <>
-            <AssetsSummaryTiles
+            {/* Cost summary tiles */}
+            <AssetsSummaryTiles assets={assets} currency={currency} />
+
+            {/* Cost over time chart */}
+            <AssetCostChart
               assets={assets}
               currency={currency}
-              activeTab={tabParam}
-              onTabChange={(key) => updateParams({ tab: key })}
+              windowStr={windowParam}
             />
 
-            {/* Filter pills — Grafana style */}
+            {/* Filter pills */}
             <div className="assets-filter-bar">
               {assetTypeTabs
                 .filter((t) => t.key === "all" || (typeCounts[t.key] || 0) > 0)
@@ -185,7 +211,18 @@ const Assets = React.memo(() => {
                 ))}
             </div>
 
-            <AssetsTable assets={filteredAssets} currency={currency} />
+            <AssetsTable
+              assets={filteredAssets}
+              currency={currency}
+              windowStr={windowParam}
+            />
+
+            {lastUpdated && (
+              <div className="assets-last-updated">
+                Last updated: {lastUpdated.toLocaleTimeString()}
+                {autoRefresh && <span className="auto-badge">AUTO</span>}
+              </div>
+            )}
           </>
         )}
       </div>
