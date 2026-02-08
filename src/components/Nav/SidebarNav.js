@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Drawer, List } from "@mui/material";
+import { Drawer, List, useMediaQuery } from "@mui/material";
 
 import { NavItem } from "./NavItem";
 import {
@@ -16,22 +16,25 @@ const DRAWER_WIDTH = 200;
 
 const SidebarNav = ({ active }) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const isMobile = useMatchMedia("(max-width: 900px)");
+  const isMobile = useMediaQuery("(max-width: 900px)");
 
-  React.useEffect(() => {
-    const observer = new MutationObserver(() => {});
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
+  // Close mobile drawer if screen is resized to desktop width
   React.useEffect(() => {
     if (!isMobile) setMobileOpen(false);
   }, [isMobile]);
 
-  const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
+  // Prevent accidental submits / rapid toggles causing page refreshes
+  const lastToggleRef = React.useRef(0);
+  const handleDrawerToggle = (e) => {
+    if (e && typeof e.preventDefault === "function") {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const now = Date.now();
+    if (now - lastToggleRef.current < 200) return; // ignore rapid toggles
+    lastToggleRef.current = now;
+    setMobileOpen((prev) => !prev);
+  };
 
   const navLinks = [
     { name: "Cost Allocation", href: "/allocation", icon: <BarChart /> },
@@ -57,7 +60,8 @@ const SidebarNav = ({ active }) => {
         />
         {showClose && (
           <button
-            onClick={handleDrawerToggle}
+            type="button"
+            onClick={(e) => handleDrawerToggle(e)}
             style={{
               background: "none",
               border: "none",
@@ -95,59 +99,67 @@ const SidebarNav = ({ active }) => {
 
   return (
     <>
-      {/* Hamburger — CSS-driven visibility, no React flicker */}
-      <button
-        onClick={handleDrawerToggle}
-        aria-label="Open navigation"
-        className="sidebar-hamburger"
-        style={{
-          position: "fixed",
-          top: "0.875rem",
-          left: "0.875rem",
-          zIndex: 1300,
-          background: "var(--card-bg)",
-          border: "1px solid var(--border-color)",
-          borderRadius: "10px",
-          padding: "8px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "var(--text-primary)",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        }}
-      >
-        <MenuIcon fontSize="small" />
-      </button>
+      {/* Hamburger — only render on mobile */}
+      {isMobile && (
+        <button
+          type="button"
+          onClick={(e) => handleDrawerToggle(e)}
+          aria-label="Open navigation"
+          aria-expanded={mobileOpen}
+          className="sidebar-hamburger"
+          style={{
+            position: "fixed",
+            top: "0.875rem",
+            left: "0.875rem",
+            zIndex: 1300,
+            background: "var(--card-bg)",
+            border: "1px solid var(--border-color)",
+            borderRadius: "10px",
+            padding: "8px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--text-primary)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          }}
+        >
+          <MenuIcon fontSize="small" />
+        </button>
+      )}
 
-      {/* Desktop: permanent drawer (CSS hides it on ≤900px) */}
-      <Drawer
-        variant="permanent"
-        open
-        className="sidebar-desktop"
-        sx={{
-          flexShrink: 0,
-          width: DRAWER_WIDTH,
-          "& .MuiDrawer-paper": paperSx,
-        }}
-      >
-        {drawerContent(false)}
-      </Drawer>
+      {/* Desktop: permanent drawer — only when not mobile */}
+      {!isMobile && (
+        <Drawer
+          variant="permanent"
+          open
+          className="sidebar-desktop"
+          sx={{
+            flexShrink: 0,
+            width: DRAWER_WIDTH,
+            "& .MuiDrawer-paper": paperSx,
+          }}
+        >
+          {drawerContent(false)}
+        </Drawer>
+      )}
 
       {/* Mobile: temporary overlay drawer */}
-      <Drawer
-        variant="temporary"
-        anchor="left"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
-        className="sidebar-mobile"
-        sx={{
-          "& .MuiDrawer-paper": paperSx,
-        }}
-      >
-        {drawerContent(true)}
-      </Drawer>
+      {isMobile && (
+        <Drawer
+          variant="temporary"
+          anchor="left"
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+          ModalProps={{ keepMounted: true }}
+          className="sidebar-mobile"
+          sx={{
+            "& .MuiDrawer-paper": paperSx,
+          }}
+        >
+          {drawerContent(true)}
+        </Drawer>
+      )}
     </>
   );
 };

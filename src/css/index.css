@@ -37,35 +37,8 @@ body .page-container {
   }
 }
 
-/* ─── Sidebar responsive rules ─── */
-
-/* Desktop: spacer takes up room, hamburger hidden */
-.sidebar-spacer {
-  width: 220px;
-  flex-shrink: 0;
-}
+/* ─── Sidebar / layout ─── */
 .page-content {
   position: relative;
   flex-grow: 1;
-  padding: 2.5rem 2rem 2rem;
-}
-
-/* Mobile (≤900px): hide permanent drawer, show hamburger, collapse spacer */
-@media (max-width: 900px) {
-  .sidebar-spacer {
-    width: 0 !important;
-  }
-  .sidebar-desktop {
-    display: none !important;
-  }
-  .page-content {
-    padding: 4rem 1rem 2rem !important;
-  }
-}
-
-/* Desktop (>900px): hide hamburger, hide mobile drawer backdrop */
-@media (min-width: 901px) {
-  .sidebar-hamburger {
-    display: none !important;
-  }
 }

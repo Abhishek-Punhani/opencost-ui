@@ -14,9 +14,9 @@ import AssetsSummaryTiles from "../components/assets/AssetsSummaryTiles";
 import AssetCostChart from "../components/assets/AssetCostChart";
 import AssetsDashboard from "../components/assets/AssetsDashboard";
 import AssetsTable from "../components/assets/AssetsTable";
-import LoadingSkeleton from "../components/assets/LoadingSkeleton";
 import { windowOptions, assetTypeTabs } from "../components/assets/tokens";
 import AssetsService from "../services/assets";
+import CircularProgress from "@mui/material/CircularProgress";
 import {
   getExchangeRates,
   CURRENCY_OPTIONS,
@@ -346,7 +346,15 @@ const Assets = React.memo(() => {
         )}
 
         {loading ? (
-          <LoadingSkeleton />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "50px",
+            }}
+          >
+            <CircularProgress />
+          </div>
         ) : assets.length === 0 ? (
           <div className="assets-empty">
             <p>No asset data available for the selected window.</p>

@@ -1,8 +1,10 @@
 import { useLocation } from "react-router";
+import { useMediaQuery } from "@mui/material";
 import { SidebarNav, DRAWER_WIDTH } from "./Nav/SidebarNav";
 
 const Page = (props) => {
   const { pathname } = useLocation();
+  const isMobile = useMediaQuery("(max-width: 900px)");
 
   return (
     <div
@@ -13,21 +15,25 @@ const Page = (props) => {
         backgroundColor: "var(--bg-secondary)",
       }}
     >
-      {/* Sidebar — the SidebarNav handles its own responsive behaviour.
-          This spacer pushes content right on desktop; CSS collapses it on mobile. */}
-      <div className="sidebar-spacer">
-        <SidebarNav active={pathname} />
-      </div>
+      {/* Sidebar nav — renders its own drawer(s) */}
+      <SidebarNav active={pathname} />
 
+      {/* Main content area */}
       <div
         style={{
           display: "flex",
           flexFlow: "column",
           flexGrow: 1,
           minWidth: 0,
+          marginLeft: isMobile ? 0 : DRAWER_WIDTH,
         }}
       >
-        <div className="page-content">
+        <div
+          className="page-content"
+          style={{
+            padding: isMobile ? "4rem 1rem 2rem" : "2.5rem 2rem 2rem",
+          }}
+        >
           <div
             style={{
               display: "flex",
