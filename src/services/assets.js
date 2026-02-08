@@ -13,6 +13,7 @@ function getMockAssets() {
         properties: {
           category: "Compute",
           provider: "GCP",
+          account: "demo-gcp-account",
           project: "demo-project",
           service: "Kubernetes",
           cluster: "demo-cluster",
@@ -25,12 +26,14 @@ function getMockAssets() {
           node_kubernetes_io_instance_type: "e2-medium",
           topology_kubernetes_io_region: "us-central1",
           topology_kubernetes_io_zone: "us-central1-a",
+          cloud_google_com_gke_nodepool: "demo-pool",
         },
         window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
         start: "2026-02-01T00:00:00Z",
         end: "2026-02-08T00:00:00Z",
         minutes: 10080,
         nodeType: "e2-medium",
+        pool: "demo-pool",
         cpuCores: 2,
         ramBytes: 4294967296,
         cpuCoreHours: 336,
@@ -46,6 +49,11 @@ function getMockAssets() {
         ramCost: 4.18,
         adjustment: -0.25,
         totalCost: 12.35,
+        overhead: {
+          cpuOverheadFraction: 0.06,
+          ramOverheadFraction: 0.09,
+          overheadCostFraction: 0.075,
+        },
       },
     "GCP/__undefined__/demo-project/Compute/demo-cluster/Node/Kubernetes/gke-demo-pool-e5f6g7h8-a3b4/gke-demo-pool-e5f6g7h8-a3b4":
       {
@@ -53,6 +61,7 @@ function getMockAssets() {
         properties: {
           category: "Compute",
           provider: "GCP",
+          account: "demo-gcp-account",
           project: "demo-project",
           service: "Kubernetes",
           cluster: "demo-cluster",
@@ -65,12 +74,14 @@ function getMockAssets() {
           node_kubernetes_io_instance_type: "e2-standard-4",
           topology_kubernetes_io_region: "us-central1",
           topology_kubernetes_io_zone: "us-central1-b",
+          cloud_google_com_gke_nodepool: "demo-pool",
         },
         window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
         start: "2026-02-01T00:00:00Z",
         end: "2026-02-08T00:00:00Z",
         minutes: 10080,
         nodeType: "e2-standard-4",
+        pool: "demo-pool",
         cpuCores: 4,
         ramBytes: 17179869184,
         cpuCoreHours: 672,
@@ -86,6 +97,11 @@ function getMockAssets() {
         ramCost: 16.72,
         adjustment: -0.5,
         totalCost: 33.06,
+        overhead: {
+          cpuOverheadFraction: 0.04,
+          ramOverheadFraction: 0.07,
+          overheadCostFraction: 0.055,
+        },
       },
     "AWS/__undefined__/prod-account/Compute/prod-cluster/Node/Kubernetes/ip-10-0-1-42.ec2.internal/ip-10-0-1-42.ec2.internal":
       {
@@ -93,6 +109,7 @@ function getMockAssets() {
         properties: {
           category: "Compute",
           provider: "AWS",
+          account: "prod-account",
           project: "prod-account",
           service: "Kubernetes",
           cluster: "prod-cluster",
@@ -105,12 +122,14 @@ function getMockAssets() {
           node_kubernetes_io_instance_type: "m5.xlarge",
           topology_kubernetes_io_region: "us-east-1",
           topology_kubernetes_io_zone: "us-east-1a",
+          eks_amazonaws_com_nodegroup: "prod-workers",
         },
         window: { start: "2026-02-01T00:00:00Z", end: "2026-02-08T00:00:00Z" },
         start: "2026-02-01T00:00:00Z",
         end: "2026-02-08T00:00:00Z",
         minutes: 10080,
         nodeType: "m5.xlarge",
+        pool: "prod-workers",
         cpuCores: 4,
         ramBytes: 17179869184,
         cpuCoreHours: 672,
@@ -126,6 +145,11 @@ function getMockAssets() {
         ramCost: 18.14,
         adjustment: 0,
         totalCost: 40.82,
+        overhead: {
+          cpuOverheadFraction: 0.05,
+          ramOverheadFraction: 0.08,
+          overheadCostFraction: 0.065,
+        },
       },
     "GCP/__undefined__/demo-project/Storage/demo-cluster/Disk/Kubernetes/pvc-abc123/pvc-abc123":
       {
@@ -155,6 +179,7 @@ function getMockAssets() {
         volumeName: "pvc-abc123",
         claimName: "prometheus-server",
         claimNamespace: "prometheus-system",
+        local: 0,
       },
     "GCP/__undefined__/demo-project/Storage/demo-cluster/Disk/Kubernetes/pvc-def456/pvc-def456":
       {
@@ -184,6 +209,7 @@ function getMockAssets() {
         volumeName: "pvc-def456",
         claimName: "data-postgres-0",
         claimNamespace: "database",
+        local: 0,
       },
     "AWS/__undefined__/prod-account/Network/prod-cluster/LoadBalancer/Kubernetes/ab1234-elb/ab1234-elb":
       {
@@ -265,6 +291,7 @@ function getMockAssets() {
         end: "2026-02-08T00:00:00Z",
         minutes: 10080,
         adjustment: 0,
+        credit: -1.25,
         totalCost: 6.72,
       },
   };

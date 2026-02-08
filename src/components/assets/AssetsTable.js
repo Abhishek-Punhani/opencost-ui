@@ -45,6 +45,12 @@ const NodeDetail = ({ asset, currency }) => (
         <span className="detail-label">Instance Type</span>
         <span className="detail-value">{asset.nodeType || "—"}</span>
       </div>
+      {asset.pool && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Node Pool</span>
+          <span className="detail-value">{asset.pool}</span>
+        </div>
+      )}
       <div className="asset-detail-row">
         <span className="detail-label">CPU Cores</span>
         <span className="detail-value">{asset.cpuCores || 0}</span>
@@ -63,6 +69,12 @@ const NodeDetail = ({ asset, currency }) => (
         <div className="asset-detail-row">
           <span className="detail-label">Preemptible</span>
           <span className="detail-value">Yes</span>
+        </div>
+      )}
+      {asset.properties?.account && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Account</span>
+          <span className="detail-value">{asset.properties.account}</span>
         </div>
       )}
     </div>
@@ -110,7 +122,38 @@ const NodeDetail = ({ asset, currency }) => (
       <UtilizationBar breakdown={asset.cpuBreakdown} label="CPU" />
       <div style={{ height: "0.75rem" }} />
       <UtilizationBar breakdown={asset.ramBreakdown} label="RAM" />
+      {asset.overhead && (
+        <div style={{ marginTop: "0.75rem" }}>
+          <div className="asset-detail-row">
+            <span className="detail-label">CPU Overhead</span>
+            <span className="detail-value">
+              {Math.round((asset.overhead.cpuOverheadFraction || 0) * 100)}%
+            </span>
+          </div>
+          <div className="asset-detail-row">
+            <span className="detail-label">RAM Overhead</span>
+            <span className="detail-value">
+              {Math.round((asset.overhead.ramOverheadFraction || 0) * 100)}%
+            </span>
+          </div>
+          <div className="asset-detail-row">
+            <span className="detail-label">Overhead Cost</span>
+            <span className="detail-value">
+              {Math.round((asset.overhead.overheadCostFraction || 0) * 100)}%
+            </span>
+          </div>
+        </div>
+      )}
     </div>
+    {asset.minutes > 0 && (
+      <div className="asset-detail-section">
+        <h6>Time Coverage</h6>
+        <div className="asset-detail-row">
+          <span className="detail-label">Duration</span>
+          <span className="detail-value">{formatMinutes(asset.minutes)}</span>
+        </div>
+      </div>
+    )}
   </div>
 );
 
@@ -133,6 +176,12 @@ const DiskDetail = ({ asset, currency }) => (
         <span className="detail-label">Peak Usage</span>
         <span className="detail-value">{formatBytes(asset.byteUsageMax)}</span>
       </div>
+      {asset.volumeName && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Volume Name</span>
+          <span className="detail-value">{asset.volumeName}</span>
+        </div>
+      )}
       {asset.claimName && (
         <div className="asset-detail-row">
           <span className="detail-label">PVC Claim</span>
@@ -141,18 +190,50 @@ const DiskDetail = ({ asset, currency }) => (
           </span>
         </div>
       )}
+      {asset.local > 0 && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Local Disk</span>
+          <span className="detail-value">Yes</span>
+        </div>
+      )}
+    </div>
+    <div className="asset-detail-section">
+      <h6>Cost</h6>
+      <div className="asset-detail-row">
+        <span className="detail-label">Total Cost</span>
+        <span className="detail-value">
+          {toCurrency(asset.totalCost, currency)}
+        </span>
+      </div>
+      {asset.adjustment !== 0 && asset.adjustment !== undefined && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Adjustment</span>
+          <span className="detail-value">
+            {toCurrency(asset.adjustment, currency)}
+          </span>
+        </div>
+      )}
     </div>
     <div className="asset-detail-section">
       <h6>Utilization</h6>
       <UtilizationBar breakdown={asset.breakdown} label="Storage" />
     </div>
+    {asset.minutes > 0 && (
+      <div className="asset-detail-section">
+        <h6>Time Coverage</h6>
+        <div className="asset-detail-row">
+          <span className="detail-label">Duration</span>
+          <span className="detail-value">{formatMinutes(asset.minutes)}</span>
+        </div>
+      </div>
+    )}
   </div>
 );
 
 /**
  * Renders the expanded detail content for a LoadBalancer asset.
  */
-const LoadBalancerDetail = ({ asset }) => (
+const LoadBalancerDetail = ({ asset, currency }) => (
   <div className="asset-detail-grid">
     <div className="asset-detail-section">
       <h6>Load Balancer Details</h6>
@@ -169,11 +250,102 @@ const LoadBalancerDetail = ({ asset }) => (
         </span>
       </div>
     </div>
+    <div className="asset-detail-section">
+      <h6>Cost</h6>
+      <div className="asset-detail-row">
+        <span className="detail-label">Total Cost</span>
+        <span className="detail-value">
+          {toCurrency(asset.totalCost, currency)}
+        </span>
+      </div>
+      {asset.adjustment !== 0 && asset.adjustment !== undefined && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Adjustment</span>
+          <span className="detail-value">
+            {toCurrency(asset.adjustment, currency)}
+          </span>
+        </div>
+      )}
+    </div>
+    {asset.minutes > 0 && (
+      <div className="asset-detail-section">
+        <h6>Time Coverage</h6>
+        <div className="asset-detail-row">
+          <span className="detail-label">Duration</span>
+          <span className="detail-value">{formatMinutes(asset.minutes)}</span>
+        </div>
+      </div>
+    )}
   </div>
 );
 
 /**
- * Generic detail for Network, Cloud, and ClusterManagement types.
+ * Renders the expanded detail content for a Cloud asset.
+ */
+const CloudDetail = ({ asset, currency }) => (
+  <div className="asset-detail-grid">
+    <div className="asset-detail-section">
+      <h6>Cloud Details</h6>
+      <div className="asset-detail-row">
+        <span className="detail-label">Provider</span>
+        <span className="detail-value">
+          {asset.properties?.provider || "—"}
+        </span>
+      </div>
+      <div className="asset-detail-row">
+        <span className="detail-label">Service</span>
+        <span className="detail-value">{asset.properties?.service || "—"}</span>
+      </div>
+      <div className="asset-detail-row">
+        <span className="detail-label">Project</span>
+        <span className="detail-value">{asset.properties?.project || "—"}</span>
+      </div>
+      {asset.properties?.account && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Account</span>
+          <span className="detail-value">{asset.properties.account}</span>
+        </div>
+      )}
+    </div>
+    <div className="asset-detail-section">
+      <h6>Cost</h6>
+      <div className="asset-detail-row">
+        <span className="detail-label">Total Cost</span>
+        <span className="detail-value">
+          {toCurrency(asset.totalCost, currency)}
+        </span>
+      </div>
+      {asset.credit !== 0 && asset.credit !== undefined && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Credit</span>
+          <span className="detail-value">
+            {toCurrency(asset.credit, currency)}
+          </span>
+        </div>
+      )}
+      {asset.adjustment !== 0 && asset.adjustment !== undefined && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Adjustment</span>
+          <span className="detail-value">
+            {toCurrency(asset.adjustment, currency)}
+          </span>
+        </div>
+      )}
+    </div>
+    {asset.minutes > 0 && (
+      <div className="asset-detail-section">
+        <h6>Time Coverage</h6>
+        <div className="asset-detail-row">
+          <span className="detail-label">Duration</span>
+          <span className="detail-value">{formatMinutes(asset.minutes)}</span>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+/**
+ * Generic detail for Network and ClusterManagement types.
  */
 const GenericDetail = ({ asset, currency }) => (
   <div className="asset-detail-grid">
@@ -193,13 +365,39 @@ const GenericDetail = ({ asset, currency }) => (
         <span className="detail-label">Project</span>
         <span className="detail-value">{asset.properties?.project || "—"}</span>
       </div>
+      {asset.properties?.account && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Account</span>
+          <span className="detail-value">{asset.properties.account}</span>
+        </div>
+      )}
+    </div>
+    <div className="asset-detail-section">
+      <h6>Cost</h6>
       <div className="asset-detail-row">
         <span className="detail-label">Total Cost</span>
         <span className="detail-value">
           {toCurrency(asset.totalCost, currency)}
         </span>
       </div>
+      {asset.adjustment !== 0 && asset.adjustment !== undefined && (
+        <div className="asset-detail-row">
+          <span className="detail-label">Adjustment</span>
+          <span className="detail-value">
+            {toCurrency(asset.adjustment, currency)}
+          </span>
+        </div>
+      )}
     </div>
+    {asset.minutes > 0 && (
+      <div className="asset-detail-section">
+        <h6>Time Coverage</h6>
+        <div className="asset-detail-row">
+          <span className="detail-label">Duration</span>
+          <span className="detail-value">{formatMinutes(asset.minutes)}</span>
+        </div>
+      </div>
+    )}
     {asset.labels && Object.keys(asset.labels).length > 0 && (
       <div className="asset-detail-section">
         <h6>Labels</h6>
@@ -230,6 +428,7 @@ const AssetExpandedDetail = ({ asset, currency }) => {
     Node: NodeDetail,
     Disk: DiskDetail,
     LoadBalancer: LoadBalancerDetail,
+    Cloud: CloudDetail,
   };
   const DetailComponent = detailMap[asset.type] || GenericDetail;
 
@@ -288,6 +487,19 @@ function formatBytes(bytes) {
     i++;
   }
   return `${val.toFixed(val >= 100 ? 0 : val >= 10 ? 1 : 2)} ${units[i]}`;
+}
+
+/**
+ * Format minutes to human readable (e.g. "7d 0h", "23h 45m").
+ */
+function formatMinutes(mins) {
+  if (!mins || mins <= 0) return "—";
+  const days = Math.floor(mins / 1440);
+  const hours = Math.floor((mins % 1440) / 60);
+  const minutes = Math.round(mins % 60);
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
 }
 
 /**

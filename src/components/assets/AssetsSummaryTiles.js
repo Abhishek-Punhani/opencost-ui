@@ -13,9 +13,62 @@ import { toCurrency } from "../../util";
  */
 const AssetsSummaryTiles = ({ assets, currency, activeTab, onTabChange }) => {
   const totalCost = assets.reduce((sum, a) => sum + (a.totalCost || 0), 0);
-  const nodeCount = assets.filter((a) => a.type === "Node").length;
-  const diskCount = assets.filter((a) => a.type === "Disk").length;
-  const lbCount = assets.filter((a) => a.type === "LoadBalancer").length;
+
+  // Count and cost per type
+  const typeSummary = (type) => {
+    const items = assets.filter((a) => a.type === type);
+    return {
+      count: items.length,
+      cost: items.reduce((s, a) => s + (a.totalCost || 0), 0),
+    };
+  };
+
+  const nodes = typeSummary("Node");
+  const disks = typeSummary("Disk");
+  const lbs = typeSummary("LoadBalancer");
+  const networks = typeSummary("Network");
+  const mgmt = typeSummary("ClusterManagement");
+  const cloud = typeSummary("Cloud");
+
+  // Only include type tiles that have assets
+  const typeTiles = [
+    {
+      key: "Node",
+      label: "Nodes",
+      data: nodes,
+      className: "assets-summary-tile--nodes",
+    },
+    {
+      key: "Disk",
+      label: "Disks",
+      data: disks,
+      className: "assets-summary-tile--disks",
+    },
+    {
+      key: "LoadBalancer",
+      label: "Load Balancers",
+      data: lbs,
+      className: "assets-summary-tile--lbs",
+    },
+    {
+      key: "Network",
+      label: "Network",
+      data: networks,
+      className: "assets-summary-tile--network",
+    },
+    {
+      key: "ClusterManagement",
+      label: "Management",
+      data: mgmt,
+      className: "assets-summary-tile--mgmt",
+    },
+    {
+      key: "Cloud",
+      label: "Cloud",
+      data: cloud,
+      className: "assets-summary-tile--cloud",
+    },
+  ].filter((t) => t.data.count > 0);
 
   const tiles = [
     {
@@ -25,42 +78,13 @@ const AssetsSummaryTiles = ({ assets, currency, activeTab, onTabChange }) => {
       sub: `${assets.length} assets`,
       className: "assets-summary-tile--total",
     },
-    {
-      key: "Node",
-      label: "Nodes",
-      value: nodeCount,
-      sub: toCurrency(
-        assets
-          .filter((a) => a.type === "Node")
-          .reduce((s, a) => s + a.totalCost, 0),
-        currency,
-      ),
-      className: "assets-summary-tile--nodes",
-    },
-    {
-      key: "Disk",
-      label: "Disks",
-      value: diskCount,
-      sub: toCurrency(
-        assets
-          .filter((a) => a.type === "Disk")
-          .reduce((s, a) => s + a.totalCost, 0),
-        currency,
-      ),
-      className: "assets-summary-tile--disks",
-    },
-    {
-      key: "LoadBalancer",
-      label: "Load Balancers",
-      value: lbCount,
-      sub: toCurrency(
-        assets
-          .filter((a) => a.type === "LoadBalancer")
-          .reduce((s, a) => s + a.totalCost, 0),
-        currency,
-      ),
-      className: "assets-summary-tile--lbs",
-    },
+    ...typeTiles.map((t) => ({
+      key: t.key,
+      label: t.label,
+      value: t.data.count,
+      sub: toCurrency(t.data.cost, currency),
+      className: t.className,
+    })),
   ];
 
   return (
