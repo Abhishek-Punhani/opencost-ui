@@ -1,6 +1,7 @@
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import ThemeToggle from "./ThemeToggle";
 
 const Header = (props) => {
   const { title, breadcrumbs, headerTitle } = props;
@@ -13,6 +14,8 @@ const Header = (props) => {
         flexFlow: "row",
         width: "100%",
         marginTop: "10px",
+        flexWrap: "wrap",
+        gap: "1rem",
       }}
     >
       <Typography variant="h3" style={{ marginBottom: "10px" }}>
@@ -33,7 +36,17 @@ const Header = (props) => {
           </Breadcrumbs>
         )}
       </div>
-      <div style={{ flex: "0 0 auto" }}>{props.children}</div>
+      <div
+        style={{
+          flex: "0 0 auto",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+        }}
+      >
+        <ThemeToggle />
+        {props.children}
+      </div>
     </div>
   );
 };

@@ -32,34 +32,34 @@ const AssetsSummaryTiles = ({ assets, currency }) => {
     {
       label: "Total Cost",
       value: toCurrency(metrics.totalCost, currency),
-      accent: "#161616",
+      accent: "#0f62fe",
     },
     {
       label: "CPU Cost",
       value: toCurrency(metrics.cpuCost, currency),
-      accent: "#0f62fe",
+      accent: "#5b9cff",
     },
     {
       label: "RAM Cost",
       value: toCurrency(metrics.ramCost, currency),
-      accent: "#007d79",
+      accent: "#00c7c3",
     },
     {
       label: "GPU Cost",
       value: toCurrency(metrics.gpuCost, currency),
-      accent: "#8a3ffc",
+      accent: "#a56eff",
       hide: metrics.gpuCost === 0,
     },
     {
       label: "Storage Cost",
       value: toCurrency(metrics.storageCost, currency),
-      accent: "#0072c4",
+      accent: "#1192e8",
       hide: metrics.storageCost === 0,
     },
     {
       label: "Total Assets",
       value: String(assets.length),
-      accent: "#525252",
+      accent: "#8a8a8a",
     },
   ].filter((t) => !t.hide);
 

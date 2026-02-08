@@ -1,0 +1,158 @@
+/* Claude.ai inspired theme variables */
+:root {
+  /* Light theme */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-elevated: #ffffff;
+  --bg-hover: #f8faff;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #525252;
+  --text-tertiary: #737373;
+  --text-disabled: #a3a3a3;
+
+  --border-color: #e5e7eb;
+  --border-light: #f0f0f0;
+  --border-hover: #d1d5db;
+
+  --accent-primary: #0f62fe;
+  --accent-hover: #0353e9;
+  --accent-light: #eef4ff;
+
+  --button-bg: #f4f4f5;
+  --button-hover-bg: #e5e5e5;
+
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --card-hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+
+  --table-header-bg: #fbfcff;
+  --table-row-hover: #f8faff;
+
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e5e7eb;
+
+  /* Chart colors - light */
+  --chart-grid: #e5e7eb;
+  --chart-text: #737373;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: #e5e7eb;
+}
+
+[data-theme="dark"] {
+  /* Dark theme - Claude.ai inspired with improved contrast */
+  --bg-primary: #0d0d0d;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #242424;
+  --bg-elevated: #1e1e1e;
+  --bg-hover: #2a2a2a;
+
+  --text-primary: #ececec;
+  --text-secondary: #b4b4b4;
+  --text-tertiary: #8a8a8a;
+  --text-disabled: #5a5a5a;
+
+  --border-color: #2a2a2a;
+  --border-light: #222222;
+  --border-hover: #3a3a3a;
+
+  --accent-primary: #6ba3ff;
+  --accent-hover: #5b9cff;
+  --accent-light: #1a3a5a;
+
+  --button-bg: #242424;
+  --button-hover-bg: #2e2e2e;
+
+  --card-bg: #1a1a1a;
+  --card-border: #2a2a2a;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --card-hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+
+  --table-header-bg: #1e1e1e;
+  --table-row-hover: #242424;
+
+  --sidebar-bg: #141414;
+  --sidebar-border: #2a2a2a;
+  --sidebar-hover: #222222;
+  --sidebar-active: #2a2a2a;
+
+  /* Chart colors - dark */
+  --chart-grid: #2a2a2a;
+  --chart-text: #b4b4b4;
+  --chart-tooltip-bg: #1e1e1e;
+  --chart-tooltip-border: #3a3a3a;
+}
+
+/* Smooth transitions for theme changes */
+body,
+.assets-page,
+.cost-tile,
+.assets-table-wrap,
+.asset-cost-chart,
+.detail-page-header {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Dark mode typography improvements */
+[data-theme="dark"] {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+[data-theme="dark"] body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Better contrast for headings in dark mode */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Sidebar improvements for dark mode */
+[data-theme="dark"] .MuiDrawer-paper {
+  background-color: var(--sidebar-bg) !important;
+  border-right-color: var(--sidebar-border) !important;
+}
+
+[data-theme="dark"] .MuiDrawer-paper img {
+  filter: brightness(0.9);
+}
+
+[data-theme="dark"] .MuiListItem-root {
+  color: var(--text-primary);
+}
+
+/* Input and select improvements */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Better link colors in dark mode */
+[data-theme="dark"] a {
+  color: var(--accent-primary);
+}
+
+[data-theme="dark"] a:hover {
+  color: var(--accent-hover);
+}

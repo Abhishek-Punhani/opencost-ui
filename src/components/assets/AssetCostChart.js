@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -12,6 +12,7 @@ import {
   Legend,
 } from "recharts";
 import { toCurrency } from "../../util";
+import { getChartTheme, TYPE_COLORS } from "../../utils/chartTheme";
 
 /**
  * Builds daily cost breakdown from asset dailyCosts arrays.
@@ -129,22 +130,21 @@ function toCumulative(data, types) {
   });
 }
 
-const TYPE_COLORS = {
-  Node: "#0f62fe",
-  Disk: "#009d9a",
-  LoadBalancer: "#8a3ffc",
-  Network: "#1192e8",
-  ClusterManagement: "#8d8d8d",
-  Cloud: "#d12771",
-};
-
 const CustomTooltip = ({ active, payload, label, currency, cumulative }) => {
   if (!active || !payload?.length) return null;
 
   const total = payload.reduce((sum, p) => sum + (p.value || 0), 0);
+  const chartTheme = getChartTheme();
 
   return (
-    <div className="chart-tooltip">
+    <div
+      className="chart-tooltip"
+      style={{
+        background: chartTheme.tooltipBg,
+        borderColor: chartTheme.tooltipBorder,
+        color: chartTheme.tooltipText,
+      }}
+    >
       <div className="chart-tooltip-title">{label}</div>
       <div className="chart-tooltip-total">
         {cumulative ? "Cumulative: " : "Daily: "}
@@ -182,6 +182,19 @@ const CustomTooltip = ({ active, payload, label, currency, cumulative }) => {
 const AssetCostChart = ({ assets, currency, windowStr }) => {
   const [cumulative, setCumulative] = useState(false);
   const [chartType, setChartType] = useState("area"); // "area" or "bar"
+  const [chartTheme, setChartTheme] = useState(getChartTheme());
+
+  // Update theme when it changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setChartTheme(getChartTheme());
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   const { data: dailyData, types } = useMemo(
     () => generateDailyBreakdown(assets, windowStr),
@@ -258,17 +271,17 @@ const AssetCostChart = ({ assets, currency, windowStr }) => {
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="#e0e0e0"
+                stroke={chartTheme.grid}
                 vertical={false}
               />
               <XAxis
                 dataKey="dateLabel"
-                tick={{ fontSize: 11, fill: "#6f6f6f" }}
+                tick={{ fontSize: 11, fill: chartTheme.text }}
                 tickLine={false}
-                axisLine={{ stroke: "#e0e0e0" }}
+                axisLine={{ stroke: chartTheme.grid }}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: "#6f6f6f" }}
+                tick={{ fontSize: 11, fill: chartTheme.text }}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v) => `$${v.toFixed(0)}`}
@@ -303,17 +316,17 @@ const AssetCostChart = ({ assets, currency, windowStr }) => {
             >
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="#e0e0e0"
+                stroke={chartTheme.grid}
                 vertical={false}
               />
               <XAxis
                 dataKey="dateLabel"
-                tick={{ fontSize: 11, fill: "#6f6f6f" }}
+                tick={{ fontSize: 11, fill: chartTheme.text }}
                 tickLine={false}
-                axisLine={{ stroke: "#e0e0e0" }}
+                axisLine={{ stroke: chartTheme.grid }}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: "#6f6f6f" }}
+                tick={{ fontSize: 11, fill: chartTheme.text }}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v) => `$${v.toFixed(0)}`}
