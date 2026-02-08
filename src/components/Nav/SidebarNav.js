@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Drawer, List, useMediaQuery, useTheme } from "@mui/material";
+import { Drawer, List } from "@mui/material";
 
 import { NavItem } from "./NavItem";
 import {
@@ -7,6 +7,7 @@ import {
   Cloud,
   Storage,
   Menu as MenuIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 
 const logo = new URL("../../images/logo.png", import.meta.url).href;
@@ -14,120 +15,141 @@ const logo = new URL("../../images/logo.png", import.meta.url).href;
 const DRAWER_WIDTH = 200;
 
 const SidebarNav = ({ active }) => {
-  const [init, setInit] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [currentTheme, setCurrentTheme] = React.useState(
-    document.documentElement.getAttribute("data-theme") || "light",
-  );
-  const theme = useTheme();
-  const isMobile = useMediaQuery("(max-width: 900px)");
+  const isMobile = useMatchMedia("(max-width: 900px)");
 
   React.useEffect(() => {
-    if (!init) {
-      setInit(true);
-    }
-
-    // Listen for theme changes
-    const observer = new MutationObserver(() => {
-      const newTheme =
-        document.documentElement.getAttribute("data-theme") || "light";
-      setCurrentTheme(newTheme);
-    });
-
+    const observer = new MutationObserver(() => {});
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-theme"],
     });
-
     return () => observer.disconnect();
-  }, [init]);
+  }, []);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  React.useEffect(() => {
+    if (!isMobile) setMobileOpen(false);
+  }, [isMobile]);
 
-  const top = [
-    {
-      name: "Cost Allocation",
-      href: "/allocation",
-      icon: <BarChart />,
-    },
+  const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
+
+  const navLinks = [
+    { name: "Cost Allocation", href: "/allocation", icon: <BarChart /> },
     { name: "Assets", href: "/assets", icon: <Storage /> },
     { name: "Cloud Costs", href: "/cloud", icon: <Cloud /> },
     { name: "External Costs", href: "/external-costs", icon: <Cloud /> },
   ];
 
-  const drawerContent = (
-    <>
-      <img
-        src={logo}
-        alt="OpenCost"
+  const drawerContent = (showClose = false) => (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div
         style={{
-          flexShrink: 1,
-          padding: "1rem",
-          maxWidth: "100%",
-          height: "auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0.75rem 1rem 0",
         }}
-      />
-      <List style={{ flexGrow: 1 }}>
-        {top.map((l) => (
+      >
+        <img
+          src={logo}
+          alt="OpenCost"
+          style={{ maxWidth: showClose ? "120px" : "100%", height: "auto" }}
+        />
+        {showClose && (
+          <button
+            onClick={handleDrawerToggle}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "var(--text-secondary)",
+              padding: "4px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </button>
+        )}
+      </div>
+      <List style={{ flexGrow: 1, paddingTop: "0.5rem" }}>
+        {navLinks.map((l) => (
           <NavItem
-            active={active === `${l.href}`}
+            active={active === l.href}
             key={l.name}
             {...l}
-            onClick={isMobile ? handleDrawerToggle : undefined}
+            onClick={showClose ? handleDrawerToggle : undefined}
           />
         ))}
       </List>
-    </>
+    </div>
   );
+
+  const paperSx = {
+    backgroundColor: "var(--sidebar-bg)",
+    borderRight: "1px solid var(--sidebar-border)",
+    width: DRAWER_WIDTH,
+    boxSizing: "border-box",
+    overflowX: "hidden",
+  };
 
   return (
     <>
-      {isMobile && (
-        <button
-          onClick={handleDrawerToggle}
-          style={{
-            position: "fixed",
-            top: "1rem",
-            left: "1rem",
-            zIndex: 1300,
-            background: "var(--card-bg)",
-            border: "1px solid var(--border-color)",
-            borderRadius: "8px",
-            padding: "8px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "var(--text-primary)",
-            transition: "all 0.2s ease",
-          }}
-        >
-          <MenuIcon />
-        </button>
-      )}
+      {/* Hamburger — CSS-driven visibility, no React flicker */}
+      <button
+        onClick={handleDrawerToggle}
+        aria-label="Open navigation"
+        className="sidebar-hamburger"
+        style={{
+          position: "fixed",
+          top: "0.875rem",
+          left: "0.875rem",
+          zIndex: 1300,
+          background: "var(--card-bg)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "10px",
+          padding: "8px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "var(--text-primary)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        }}
+      >
+        <MenuIcon fontSize="small" />
+      </button>
+
+      {/* Desktop: permanent drawer (CSS hides it on ≤900px) */}
       <Drawer
-        anchor={"left"}
-        open={isMobile ? mobileOpen : true}
-        onClose={isMobile ? handleDrawerToggle : undefined}
-        variant={isMobile ? "temporary" : "permanent"}
+        variant="permanent"
+        open
+        className="sidebar-desktop"
         sx={{
           flexShrink: 0,
           width: DRAWER_WIDTH,
-          "& .MuiDrawer-paper": {
-            backgroundColor: "var(--sidebar-bg)",
-            borderRight: "1px solid var(--sidebar-border)",
-            width: DRAWER_WIDTH,
-            paddingTop: "2.5rem",
-            transition: "background-color 0.3s ease, border-color 0.3s ease",
-          },
+          "& .MuiDrawer-paper": paperSx,
         }}
       >
-        {drawerContent}
+        {drawerContent(false)}
+      </Drawer>
+
+      {/* Mobile: temporary overlay drawer */}
+      <Drawer
+        variant="temporary"
+        anchor="left"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        className="sidebar-mobile"
+        sx={{
+          "& .MuiDrawer-paper": paperSx,
+        }}
+      >
+        {drawerContent(true)}
       </Drawer>
     </>
   );
 };
 
-export { SidebarNav };
+export { SidebarNav, DRAWER_WIDTH };

@@ -441,6 +441,18 @@
 /* Table scroll wrapper */
 .table-scroll {
   overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+.table-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
 }
 
 /* Clean table */
@@ -456,15 +468,15 @@
   z-index: 10;
 }
 .assets-tbl th {
-  background: #fbfcff;
+  background: var(--table-header-bg, #fbfcff);
   text-align: left;
   padding: 1rem 1.5rem;
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.75px;
-  color: #555;
-  border-bottom: 1px solid #eaeaea;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
@@ -488,8 +500,8 @@
   cursor: default;
 }
 .assets-tbl th:hover:not(.th-nosort):not(.th-action) {
-  background: #f0f4ff;
-  color: #0f62fe;
+  background: var(--bg-hover);
+  color: var(--accent-primary);
 }
 .th-inner {
   display: inline-flex;
@@ -508,20 +520,16 @@
 /* Table rows */
 .tbl-row {
   cursor: pointer;
-  transition: all 0.15s ease;
-  background: #fff;
+  transition: background-color 0.15s ease;
+  background: var(--card-bg);
 }
 .tbl-row:hover {
-  background: #f8faff;
-  transform: translateY(-1px);
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  background: var(--table-row-hover, #f8faff);
 }
 .assets-tbl td {
   padding: 1rem 1.5rem;
-  color: #333;
-  border-bottom: 1px solid #f5f5f5;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
   font-weight: 400;
 }
@@ -784,8 +792,8 @@
   margin-bottom: 1.5rem;
 }
 .detail-cost-card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border, #e0e0e0);
   border-radius: 8px;
   padding: 1rem 1.25rem;
   display: flex;
@@ -793,18 +801,18 @@
   gap: 0.25rem;
 }
 .detail-cost-card--primary {
-  background: #ffffff;
-  border: 1px solid #eaeaea;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border, #eaeaea);
 }
 .detail-cost-card--primary .dcc-label {
-  color: #111111;
+  color: var(--text-secondary);
 }
 .detail-cost-card--primary .dcc-value {
-  color: #111111;
+  color: var(--text-primary);
 }
 .dcc-label {
   font-size: 0.6875rem;
-  color: #000000;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 500;
@@ -829,15 +837,15 @@
   }
 }
 .detail-chart-panel {
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border, #e0e0e0);
   border-radius: 8px;
   padding: 1rem 1.25rem;
 }
 .detail-section-title {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #525252;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 0.875rem;
@@ -845,7 +853,7 @@
 .detail-subsection-title {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #6f6f6f;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 1rem 0 0.5rem;
@@ -859,8 +867,8 @@
   margin-bottom: 1.5rem;
 }
 .detail-info-card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border, #e0e0e0);
   border-radius: 8px;
   padding: 1rem 1.25rem;
 }
@@ -873,19 +881,19 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.4375rem 0;
-  border-bottom: 1px solid #f4f4f4;
+  border-bottom: 1px solid var(--border-light, #f4f4f4);
   font-size: 0.8125rem;
 }
 .detail-info-row:last-child {
   border-bottom: none;
 }
 .dir-label {
-  color: #6f6f6f;
+  color: var(--text-secondary);
   font-weight: 400;
 }
 .dir-value {
   font-weight: 500;
-  color: #161616;
+  color: var(--text-primary);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -1022,12 +1030,278 @@
 .assets-empty {
   text-align: center;
   padding: 5rem 2rem;
-  color: #6f6f6f;
+  color: var(--text-secondary);
 }
 .assets-empty p {
   font-size: 0.875rem;
   max-width: 400px;
   margin: 0 auto 1rem;
+}
+
+/* ── Loading skeleton ──────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.skeleton-line {
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base, #e8e8e8) 0%,
+    var(--skeleton-shine, #f5f5f5) 40%,
+    var(--skeleton-base, #e8e8e8) 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+.skeleton-line--xs {
+  width: 60px;
+  height: 12px;
+}
+.skeleton-line--sm {
+  width: 80px;
+  height: 12px;
+}
+.skeleton-line--md {
+  width: 120px;
+  height: 14px;
+}
+.skeleton-line--lg {
+  width: 160px;
+  height: 28px;
+}
+.skeleton-line--col {
+  width: 100%;
+  height: 12px;
+}
+.skeleton-line--name {
+  width: 45%;
+  height: 14px;
+}
+.skeleton-line--pill {
+  width: 60px;
+  height: 22px;
+  border-radius: 12px;
+}
+.skeleton-line--right {
+  margin-left: auto;
+}
+
+/* Skeleton tiles */
+.skeleton-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+.skeleton-tile {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Skeleton chart */
+.skeleton-chart {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.skeleton-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+}
+.skeleton-chart-body {
+  padding: 1.5rem 1.25rem;
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+}
+.skeleton-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+.skeleton-bar {
+  flex: 1;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base, #e8e8e8) 0%,
+    var(--skeleton-shine, #f5f5f5) 40%,
+    var(--skeleton-base, #e8e8e8) 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Skeleton filter pills */
+.skeleton-filters {
+  display: flex;
+  gap: 0.5rem;
+}
+.skeleton-pill {
+  width: 90px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base, #e8e8e8) 0%,
+    var(--skeleton-shine, #f5f5f5) 40%,
+    var(--skeleton-base, #e8e8e8) 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Skeleton table */
+.skeleton-table {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.skeleton-table-header {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 1.2fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+}
+.skeleton-table-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 1.2fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+  align-items: center;
+}
+.skeleton-table-row:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .skeleton-tiles {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .skeleton-tile {
+    padding: 1rem;
+  }
+  .skeleton-table-header,
+  .skeleton-table-row {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  .skeleton-table-header > :nth-child(n + 4),
+  .skeleton-table-row > :nth-child(n + 4) {
+    display: none;
+  }
+}
+
+/* Dark theme skeleton overrides */
+[data-theme="dark"] .skeleton-line,
+[data-theme="dark"] .skeleton-bar,
+[data-theme="dark"] .skeleton-pill {
+  --skeleton-base: #222;
+  --skeleton-shine: #2e2e2e;
+}
+
+/* ── Currency selector ─────────────────────────────── */
+.currency-select {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+  transition: all 0.2s ease;
+  min-width: 72px;
+  letter-spacing: 0.3px;
+}
+.currency-select:hover {
+  border-color: var(--border-hover);
+}
+
+.rates-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  background: var(--button-bg);
+  border-radius: 50%;
+  cursor: help;
+  line-height: 1;
+}
+
+/* ── Sidebar scrollbar fix ─────────────────────────── */
+.MuiDrawer-root .MuiDrawer-paper {
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar {
+  width: 4px;
+}
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-track {
+  background: transparent;
+}
+.MuiDrawer-root .MuiDrawer-paper::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+/* ── Export CSV button ─────────────────────────────── */
+.export-csv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--button-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-secondary);
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.export-csv-btn:hover {
+  background: var(--button-hover-bg);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+.export-csv-btn svg {
+  flex-shrink: 0;
 }
 
 /* ── View toggle (Table / Visualizations) ──────────── */
@@ -1351,7 +1625,6 @@
 
 [data-theme="dark"] .tbl-row:hover {
   background: var(--table-row-hover);
-  box-shadow: var(--card-shadow);
 }
 
 [data-theme="dark"] .assets-tbl td {

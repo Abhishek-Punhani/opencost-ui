@@ -1,5 +1,5 @@
 import { useLocation } from "react-router";
-import { SidebarNav } from "./Nav/SidebarNav";
+import { SidebarNav, DRAWER_WIDTH } from "./Nav/SidebarNav";
 
 const Page = (props) => {
   const { pathname } = useLocation();
@@ -8,30 +8,26 @@ const Page = (props) => {
     <div
       style={{
         display: "flex",
-        overflowY: "scroll",
-        margin: "0px",
-        backgroundColor: "f3f3f3",
+        minHeight: "100vh",
+        margin: 0,
+        backgroundColor: "var(--bg-secondary)",
       }}
     >
-      <SidebarNav active={pathname} />
+      {/* Sidebar — the SidebarNav handles its own responsive behaviour.
+          This spacer pushes content right on desktop; CSS collapses it on mobile. */}
+      <div className="sidebar-spacer">
+        <SidebarNav active={pathname} />
+      </div>
+
       <div
         style={{
           display: "flex",
           flexFlow: "column",
           flexGrow: 1,
+          minWidth: 0,
         }}
       >
-        <div
-          style={{
-            position: "relative",
-            height: "100vh",
-            flexGrow: 1,
-            overflowX: "auto",
-            paddingLeft: "2rem",
-            paddingRight: "rem",
-            paddingTop: "2.5rem",
-          }}
-        >
+        <div className="page-content">
           <div
             style={{
               display: "flex",

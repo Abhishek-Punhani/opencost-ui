@@ -14,9 +14,61 @@ import AssetsSummaryTiles from "../components/assets/AssetsSummaryTiles";
 import AssetCostChart from "../components/assets/AssetCostChart";
 import AssetsDashboard from "../components/assets/AssetsDashboard";
 import AssetsTable from "../components/assets/AssetsTable";
+import LoadingSkeleton from "../components/assets/LoadingSkeleton";
 import { windowOptions, assetTypeTabs } from "../components/assets/tokens";
 import AssetsService from "../services/assets";
+import {
+  getExchangeRates,
+  CURRENCY_OPTIONS,
+  FALLBACK_RATES,
+} from "../services/currency";
+import { toCurrency } from "../util";
 import "../css/assets.css";
+
+/**
+ * Exports assets data as a CSV file download.
+ */
+function exportAssetsCSV(assets, currency) {
+  const headers = [
+    "Name",
+    "Type",
+    "Provider",
+    "Cluster",
+    "Total Cost",
+    "CPU Cost",
+    "RAM Cost",
+    "GPU Cost",
+    "Start",
+    "End",
+  ];
+
+  const rows = assets.map((a) => [
+    (a.properties?.name || "—").replace(/,/g, " "),
+    a.type || "—",
+    (a.properties?.provider || "—").replace(/,/g, " "),
+    (a.properties?.cluster || "—").replace(/,/g, " "),
+    toCurrency(a.totalCost || 0, currency),
+    toCurrency(a.cpuCost || 0, currency),
+    toCurrency(a.ramCost || 0, currency),
+    toCurrency(a.gpuCost || 0, currency),
+    a.start || "",
+    a.end || "",
+  ]);
+
+  const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join(
+    "\n",
+  );
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `assets_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
@@ -33,11 +85,52 @@ const Assets = React.memo(() => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMock, setIsMock] = useState(false);
-  const [currency] = useState("USD");
+  const [currency, setCurrency] = useState(
+    () => localStorage.getItem("opencost-currency") || "USD",
+  );
+  const [exchangeRates, setExchangeRates] = useState(FALLBACK_RATES);
+  const [ratesLive, setRatesLive] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [viewMode, setViewMode] = useState("table"); // "table" or "dashboard"
   const mounted = useRef(true);
+
+  // Fetch live exchange rates on mount
+  useEffect(() => {
+    let cancelled = false;
+    getExchangeRates().then(({ rates, isLive }) => {
+      if (cancelled) return;
+      setExchangeRates(rates);
+      setRatesLive(isLive);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Persist currency preference
+  const handleCurrencyChange = (newCurrency) => {
+    setCurrency(newCurrency);
+    localStorage.setItem("opencost-currency", newCurrency);
+  };
+
+  // Convert cost values based on selected currency
+  const convertedAssets = useMemo(() => {
+    const rate = exchangeRates[currency] || 1;
+    if (rate === 1) return assets; // USD, no conversion needed
+    return assets.map((a) => ({
+      ...a,
+      totalCost: (a._rawTotalCost ?? a.totalCost ?? 0) * rate,
+      cpuCost: (a._rawCpuCost ?? a.cpuCost ?? 0) * rate,
+      ramCost: (a._rawRamCost ?? a.ramCost ?? 0) * rate,
+      gpuCost: (a._rawGpuCost ?? a.gpuCost ?? 0) * rate,
+      // Keep raw USD values for re-conversion
+      _rawTotalCost: a._rawTotalCost ?? a.totalCost ?? 0,
+      _rawCpuCost: a._rawCpuCost ?? a.cpuCost ?? 0,
+      _rawRamCost: a._rawRamCost ?? a.ramCost ?? 0,
+      _rawGpuCost: a._rawGpuCost ?? a.gpuCost ?? 0,
+    }));
+  }, [assets, currency, exchangeRates]);
 
   // Update URL params without full re-render
   const updateParams = (updates) => {
@@ -104,20 +197,20 @@ const Assets = React.memo(() => {
 
   // Filter assets by the active tab
   const filteredAssets = useMemo(() => {
-    if (!tabParam || tabParam === "all") return assets;
-    return assets.filter((a) => a.type === tabParam);
-  }, [assets, tabParam]);
+    if (!tabParam || tabParam === "all") return convertedAssets;
+    return convertedAssets.filter((a) => a.type === tabParam);
+  }, [convertedAssets, tabParam]);
 
   // Count assets by type for filter buttons
   const typeCounts = useMemo(() => {
-    const counts = { all: assets.length };
+    const counts = { all: convertedAssets.length };
     assetTypeTabs.forEach((t) => {
       if (t.key !== "all") {
-        counts[t.key] = assets.filter((a) => a.type === t.key).length;
+        counts[t.key] = convertedAssets.filter((a) => a.type === t.key).length;
       }
     });
     return counts;
-  }, [assets]);
+  }, [convertedAssets]);
 
   const [showNotif, setShowNotif] = useState(true);
 
@@ -158,6 +251,48 @@ const Assets = React.memo(() => {
               <span>Visualizations</span>
             </button>
           </div>
+
+          <div className="assets-header-divider" />
+
+          {/* Currency selector */}
+          <select
+            value={currency}
+            onChange={(e) => handleCurrencyChange(e.target.value)}
+            className="currency-select"
+            title={
+              ratesLive
+                ? "Live exchange rates (ECB)"
+                : "Offline rates (approximate)"
+            }
+          >
+            {CURRENCY_OPTIONS.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.symbol} {c.code}
+              </option>
+            ))}
+          </select>
+          {!ratesLive && currency !== "USD" && (
+            <span
+              className="rates-badge"
+              title="Using approximate offline rates"
+            >
+              ≈
+            </span>
+          )}
+
+          {/* Export CSV */}
+          <button
+            className="export-csv-btn"
+            onClick={() => exportAssetsCSV(convertedAssets, currency)}
+            disabled={loading || convertedAssets.length === 0}
+            title="Export as CSV"
+          >
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+              <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z" />
+              <path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z" />
+            </svg>
+            CSV
+          </button>
 
           <div className="assets-header-divider" />
 
@@ -211,10 +346,7 @@ const Assets = React.memo(() => {
         )}
 
         {loading ? (
-          <div className="assets-loading">
-            <div className="loading-spinner" />
-            Loading assets...
-          </div>
+          <LoadingSkeleton />
         ) : assets.length === 0 ? (
           <div className="assets-empty">
             <p>No asset data available for the selected window.</p>
@@ -222,12 +354,12 @@ const Assets = React.memo(() => {
         ) : (
           <>
             {/* Cost summary tiles */}
-            <AssetsSummaryTiles assets={assets} currency={currency} />
+            <AssetsSummaryTiles assets={convertedAssets} currency={currency} />
 
             {viewMode === "dashboard" ? (
               /* ── Full dashboard visualizations ── */
               <AssetsDashboard
-                assets={assets}
+                assets={convertedAssets}
                 currency={currency}
                 windowStr={windowParam}
               />
@@ -236,7 +368,7 @@ const Assets = React.memo(() => {
               <>
                 {/* Cost over time chart */}
                 <AssetCostChart
-                  assets={assets}
+                  assets={convertedAssets}
                   currency={currency}
                   windowStr={windowParam}
                 />
