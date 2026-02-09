@@ -1,7 +1,4 @@
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import { Dropdown } from "@carbon/react";
 
 import * as React from "react";
 
@@ -22,56 +19,54 @@ function EditCloudCostControls({
   setCurrency,
 }) {
   return (
-    <div style={{ display: "inline-flex" }}>
+    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
       <SelectWindow
         windowOptions={windowOptions}
         window={window}
         setWindow={setWindow}
       />
-      <FormControl style={{ margin: 8, minWidth: 120 }} variant="standard">
-        <InputLabel id="aggregation-select-label">Breakdown</InputLabel>
-        <Select
-          id="aggregation-select"
-          value={aggregateBy}
-          onChange={(e) => {
-            setAggregateBy(e.target.value);
-          }}
-        >
-          {aggregationOptions.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl style={{ margin: 8, minWidth: 120 }} variant="standard">
-        <InputLabel id="costMetric-label">Cost Metric</InputLabel>
-        <Select
-          id="costMetric"
-          value={costMetric}
-          onChange={(e) => setCostMetric(e.target.value)}
-        >
-          {costMetricOptions.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl style={{ margin: 8, minWidth: 120 }} variant="standard">
-        <InputLabel id="currency-label">Currency</InputLabel>
-        <Select
-          id="currency"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-        >
-          {currencyOptions?.map((currency) => (
-            <MenuItem key={currency} value={currency}>
-              {currency}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Dropdown
+        id="aggregation-select"
+        titleText="Breakdown"
+        label={
+          aggregationOptions.find((o) => o.value === aggregateBy)?.name ||
+          "Select"
+        }
+        items={aggregationOptions}
+        itemToString={(item) => (item ? item.name : "")}
+        selectedItem={aggregationOptions.find((o) => o.value === aggregateBy)}
+        onChange={({ selectedItem }) =>
+          selectedItem && setAggregateBy(selectedItem.value)
+        }
+        size="sm"
+      />
+      <Dropdown
+        id="cost-metric-select"
+        titleText="Cost Metric"
+        label={
+          costMetricOptions.find((o) => o.value === costMetric)?.name ||
+          "Select"
+        }
+        items={costMetricOptions}
+        itemToString={(item) => (item ? item.name : "")}
+        selectedItem={costMetricOptions.find((o) => o.value === costMetric)}
+        onChange={({ selectedItem }) =>
+          selectedItem && setCostMetric(selectedItem.value)
+        }
+        size="sm"
+      />
+      <Dropdown
+        id="currency-select"
+        titleText="Currency"
+        label={currency}
+        items={currencyOptions?.map((c) => ({ value: c, name: c })) || []}
+        itemToString={(item) => (item ? item.name : "")}
+        selectedItem={{ value: currency, name: currency }}
+        onChange={({ selectedItem }) =>
+          selectedItem && setCurrency(selectedItem.value)
+        }
+        size="sm"
+      />
     </div>
   );
 }

@@ -1,165 +1,115 @@
 import * as React from "react";
-import { Drawer, List, useMediaQuery } from "@mui/material";
-
-import { NavItem } from "./NavItem";
+import { SideNav, SideNavItems, SideNavLink } from "@carbon/react";
 import {
-  BarChart,
-  Cloud,
-  Storage,
-  Menu as MenuIcon,
-  Close as CloseIcon,
-} from "@mui/icons-material";
+  ChartBar,
+  CloudApp,
+  VirtualMachine,
+  Currency,
+} from "@carbon/icons-react";
+import { useNavigate } from "react-router";
 
 const logo = new URL("../../images/logo.png", import.meta.url).href;
 
-const DRAWER_WIDTH = 200;
+const DRAWER_WIDTH = 256;
 
 const SidebarNav = ({ active }) => {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const isMobile = useMediaQuery("(max-width: 900px)");
+  const [isExpanded, setIsExpanded] = React.useState(true);
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 900);
+  const navigate = useNavigate();
 
-  // Close mobile drawer if screen is resized to desktop width
   React.useEffect(() => {
-    if (!isMobile) setMobileOpen(false);
-  }, [isMobile]);
-
-  // Prevent accidental submits / rapid toggles causing page refreshes
-  const lastToggleRef = React.useRef(0);
-  const handleDrawerToggle = (e) => {
-    if (e && typeof e.preventDefault === "function") {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    const now = Date.now();
-    if (now - lastToggleRef.current < 200) return; // ignore rapid toggles
-    lastToggleRef.current = now;
-    setMobileOpen((prev) => !prev);
-  };
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 900;
+      setIsMobile(mobile);
+      if (!mobile) setIsExpanded(true);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const navLinks = [
-    { name: "Cost Allocation", href: "/allocation", icon: <BarChart /> },
-    { name: "Assets", href: "/assets", icon: <Storage /> },
-    { name: "Cloud Costs", href: "/cloud", icon: <Cloud /> },
-    { name: "External Costs", href: "/external-costs", icon: <Cloud /> },
+    { name: "Cost Allocation", href: "/allocation", icon: ChartBar },
+    { name: "Assets", href: "/assets", icon: VirtualMachine },
+    { name: "Cloud Costs", href: "/cloud", icon: CloudApp },
+    { name: "External Costs", href: "/external-costs", icon: Currency },
   ];
-
-  const drawerContent = (showClose = false) => (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0.75rem 1rem 0",
-        }}
-      >
-        <img
-          src={logo}
-          alt="OpenCost"
-          style={{ maxWidth: showClose ? "120px" : "100%", height: "auto" }}
-        />
-        {showClose && (
-          <button
-            type="button"
-            onClick={(e) => handleDrawerToggle(e)}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--text-secondary)",
-              padding: "4px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <CloseIcon fontSize="small" />
-          </button>
-        )}
-      </div>
-      <List style={{ flexGrow: 1, paddingTop: "0.5rem" }}>
-        {navLinks.map((l) => (
-          <NavItem
-            active={active === l.href}
-            key={l.name}
-            {...l}
-            onClick={showClose ? handleDrawerToggle : undefined}
-          />
-        ))}
-      </List>
-    </div>
-  );
-
-  const paperSx = {
-    backgroundColor: "var(--sidebar-bg)",
-    borderRight: "1px solid var(--sidebar-border)",
-    width: DRAWER_WIDTH,
-    boxSizing: "border-box",
-    overflowX: "hidden",
-  };
 
   return (
     <>
-      {/* Hamburger — only render on mobile */}
       {isMobile && (
         <button
           type="button"
-          onClick={(e) => handleDrawerToggle(e)}
-          aria-label="Open navigation"
-          aria-expanded={mobileOpen}
+          onClick={() => setIsExpanded(!isExpanded)}
+          aria-label={isExpanded ? "Close navigation" : "Open navigation"}
           className="sidebar-hamburger"
           style={{
             position: "fixed",
-            top: "0.875rem",
-            left: "0.875rem",
-            zIndex: 1300,
+            top: "1rem",
+            left: "1rem",
+            zIndex: 8001,
             background: "var(--card-bg)",
             border: "1px solid var(--border-color)",
-            borderRadius: "10px",
+            borderRadius: "8px",
             padding: "8px",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: "var(--text-primary)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
         >
-          <MenuIcon fontSize="small" />
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 4h16v2H2V4zm0 5h16v2H2V9zm0 5h16v2H2v-2z" />
+          </svg>
         </button>
       )}
 
-      {/* Desktop: permanent drawer — only when not mobile */}
-      {!isMobile && (
-        <Drawer
-          variant="permanent"
-          open
-          className="sidebar-desktop"
-          sx={{
-            flexShrink: 0,
-            width: DRAWER_WIDTH,
-            "& .MuiDrawer-paper": paperSx,
+      <SideNav
+        isFixedNav
+        expanded={!isMobile || isExpanded}
+        isChildOfHeader={false}
+        aria-label="Side navigation"
+        onOverlayClick={() => isMobile && setIsExpanded(false)}
+        style={{
+          position: "fixed",
+          height: "100vh",
+          zIndex: 8000,
+        }}
+      >
+        <div
+          style={{
+            padding: "1.5rem 1rem 1rem",
+            borderBottom: "1px solid var(--border-color)",
           }}
         >
-          {drawerContent(false)}
-        </Drawer>
-      )}
-
-      {/* Mobile: temporary overlay drawer */}
-      {isMobile && (
-        <Drawer
-          variant="temporary"
-          anchor="left"
-          open={mobileOpen}
-          onClose={() => setMobileOpen(false)}
-          ModalProps={{ keepMounted: true }}
-          className="sidebar-mobile"
-          sx={{
-            "& .MuiDrawer-paper": paperSx,
-          }}
-        >
-          {drawerContent(true)}
-        </Drawer>
-      )}
+          <img
+            src={logo}
+            alt="OpenCost"
+            style={{ maxWidth: "100%", height: "auto" }}
+          />
+        </div>
+        <SideNavItems>
+          {navLinks.map((link) => {
+            const IconComponent = link.icon;
+            return (
+              <SideNavLink
+                key={link.href}
+                renderIcon={IconComponent}
+                href={link.href}
+                isActive={active === link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(link.href);
+                  if (isMobile) setIsExpanded(false);
+                }}
+              >
+                {link.name}
+              </SideNavLink>
+            );
+          })}
+        </SideNavItems>
+      </SideNav>
     </>
   );
 };

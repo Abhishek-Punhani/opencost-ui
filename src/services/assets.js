@@ -42,6 +42,16 @@ function windowToRange(win) {
   let start, end, days;
 
   switch (win) {
+    case "month": {
+      // Entire window - current calendar month
+      start = new Date(now);
+      start.setUTCDate(1);
+      end = new Date(now);
+      end.setUTCMonth(end.getUTCMonth() + 1);
+      end.setUTCDate(1);
+      days = Math.ceil((end - start) / 86400000);
+      break;
+    }
     case "today": {
       start = new Date(now);
       end = new Date(now);

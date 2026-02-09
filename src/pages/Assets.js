@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { useLocation, useNavigate } from "react-router";
+import { Loading, Dropdown, Checkbox } from "@carbon/react";
 
 import Page from "../components/Page";
 import Header from "../components/Header";
@@ -16,7 +17,6 @@ import AssetsDashboard from "../components/assets/AssetsDashboard";
 import AssetsTable from "../components/assets/AssetsTable";
 import { windowOptions, assetTypeTabs } from "../components/assets/tokens";
 import AssetsService from "../services/assets";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
   getExchangeRates,
   CURRENCY_OPTIONS,
@@ -296,27 +296,31 @@ const Assets = () => {
 
           <div className="assets-header-divider" />
 
-          <select
-            value={windowParam}
-            onChange={(e) => updateParams({ window: e.target.value })}
-            className="assets-window-select"
-          >
-            {windowOptions.map((w) => (
-              <option key={w.value} value={w.value}>
-                {w.name}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            id="window-selector"
+            titleText=""
+            label={
+              windowOptions.find((w) => w.value === windowParam)?.name ||
+              "Select window"
+            }
+            items={windowOptions}
+            itemToString={(item) => (item ? item.name : "")}
+            selectedItem={windowOptions.find((w) => w.value === windowParam)}
+            onChange={({ selectedItem }) =>
+              selectedItem && updateParams({ window: selectedItem.value })
+            }
+            size="sm"
+          />
           <label
             className="assets-refresh-toggle"
             title="Auto-refresh every 60s"
           >
-            <input
-              type="checkbox"
+            <Checkbox
+              id="auto-refresh-checkbox"
+              labelText="Auto-refresh"
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
             />
-            <span className="refresh-label">Auto-refresh</span>
           </label>
           <button
             className="assets-refresh-btn"
@@ -353,7 +357,7 @@ const Assets = () => {
               padding: "50px",
             }}
           >
-            <CircularProgress />
+            <Loading description="Loading assets" withOverlay={false} />
           </div>
         ) : assets.length === 0 ? (
           <div className="assets-empty">

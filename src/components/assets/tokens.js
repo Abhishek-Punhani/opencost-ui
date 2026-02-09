@@ -4,6 +4,7 @@
  */
 
 export const windowOptions = [
+  { name: "Entire window", value: "month" },
   { name: "Today", value: "today" },
   { name: "Yesterday", value: "yesterday" },
   { name: "Last 24h", value: "24h" },

@@ -1,10 +1,16 @@
 import { useLocation } from "react-router";
-import { useMediaQuery } from "@mui/material";
+import { useState, useEffect } from "react";
 import { SidebarNav, DRAWER_WIDTH } from "./Nav/SidebarNav";
 
 const Page = (props) => {
   const { pathname } = useLocation();
-  const isMobile = useMediaQuery("(max-width: 900px)");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 900);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div

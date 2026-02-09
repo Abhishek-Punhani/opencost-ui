@@ -1,7 +1,4 @@
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import { Dropdown } from "@carbon/react";
 
 import * as React from "react";
 
@@ -21,44 +18,41 @@ function ExternalCostsControls({
   setCostType,
 }) {
   return (
-    <div style={{ display: "inline-flex" }}>
+    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
       <SelectWindow
         windowOptions={windowOptions}
         window={window}
         setWindow={setWindow}
       />
-      <FormControl style={{ margin: 8, minWidth: 120 }} variant="standard">
-        <InputLabel id="aggregation-select-label">Breakdown</InputLabel>
-        <Select
-          id="aggregation-select"
-          value={aggregateBy}
-          onChange={(e) => {
-            setAggregateBy(e.target.value);
-          }}
-        >
-          {aggregationOptions.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl style={{ margin: 8, minWidth: 120 }} variant="standard">
-        <InputLabel id="aggregation-select-label">Cost Type</InputLabel>
-        <Select
-          id="cost-type-select"
-          value={costType}
-          onChange={(e) => {
-            setCostType(e.target.value);
-          }}
-        >
-          {costTypeOptions.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Dropdown
+        id="aggregation-select"
+        titleText="Breakdown"
+        label={
+          aggregationOptions.find((o) => o.value === aggregateBy)?.name ||
+          "Select"
+        }
+        items={aggregationOptions}
+        itemToString={(item) => (item ? item.name : "")}
+        selectedItem={aggregationOptions.find((o) => o.value === aggregateBy)}
+        onChange={({ selectedItem }) =>
+          selectedItem && setAggregateBy(selectedItem.value)
+        }
+        size="sm"
+      />
+      <Dropdown
+        id="cost-type-select"
+        titleText="Cost Type"
+        label={
+          costTypeOptions.find((o) => o.value === costType)?.name || "Select"
+        }
+        items={costTypeOptions}
+        itemToString={(item) => (item ? item.name : "")}
+        selectedItem={costTypeOptions.find((o) => o.value === costType)}
+        onChange={({ selectedItem }) =>
+          selectedItem && setCostType(selectedItem.value)
+        }
+        size="sm"
+      />
     </div>
   );
 }
