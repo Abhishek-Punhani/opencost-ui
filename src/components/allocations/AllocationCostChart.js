@@ -31,7 +31,10 @@ const AllocationCostChart = ({
       return { chartData: null, names: [] };
     }
     const nameSet = new Set();
-    allocationData.forEach((set) => set.forEach((a) => nameSet.add(a.name)));
+    allocationData.forEach((set) => {
+      const items = Array.isArray(set) ? set : Object.values(set);
+      items.forEach((a) => nameSet.add(a.name));
+    });
     const sortedNames = [...nameSet].sort((a, b) => {
       const tA = cumData.find((c) => c.name === a)?.totalCost || 0;
       const tB = cumData.find((c) => c.name === b)?.totalCost || 0;
@@ -41,7 +44,8 @@ const AllocationCostChart = ({
     const hasOther = sortedNames.length > 8;
 
     const data = allocationData.map((set, i) => {
-      const startStr = set[0]?.start || set[0]?.window?.start || "";
+      const items = Array.isArray(set) ? set : Object.values(set);
+      const startStr = items[0]?.start || items[0]?.window?.start || "";
       const dateLabel = startStr
         ? new Date(startStr).toLocaleDateString(navigator.language, {
             month: "short",
@@ -51,7 +55,7 @@ const AllocationCostChart = ({
         : `Day ${i + 1}`;
       const point = { dateLabel };
       let otherCost = 0;
-      set.forEach((a) => {
+      items.forEach((a) => {
         if (topNames.includes(a.name)) {
           point[a.name] = Number((a.totalCost || 0).toFixed(4));
         } else {

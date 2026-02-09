@@ -30,8 +30,9 @@ const AllocationDetail = ({
   const dailyCosts = useMemo(() => {
     if (!allocationData || allocationData.length <= 1) return [];
     return allocationData.map((set, i) => {
-      const match = set.find((a) => a.name === alloc.name);
-      const startStr = set[0]?.start || set[0]?.window?.start || "";
+      const items = Array.isArray(set) ? set : Object.values(set);
+      const match = items.find((a) => a.name === alloc.name);
+      const startStr = items[0]?.start || items[0]?.window?.start || "";
       const label = startStr
         ? new Date(startStr).toLocaleDateString(navigator.language, {
             month: "short",
