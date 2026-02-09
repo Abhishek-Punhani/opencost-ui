@@ -18,12 +18,12 @@
 .alloc-header-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .alloc-header-controls .cds--dropdown {
-  min-width: 180px;
+  min-width: 150px;
 }
 
 .alloc-header-controls .cds--list-box {
@@ -33,9 +33,9 @@
 
 .alloc-header-divider {
   width: 1px;
-  height: 24px;
+  height: 20px;
   background: var(--border-color, #e0e0e0);
-  margin: 0 2px;
+  margin: 0 1px;
   flex-shrink: 0;
 }
 
@@ -730,16 +730,28 @@
   padding-bottom: 24px;
 }
 
+/* Back + title block as a card */
+.alloc-detail-top {
+  background: var(--card-bg, #fff);
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.04));
+  margin-bottom: 20px;
+}
+
 /* Carbon Button override for back button */
 .alloc-detail-back-btn.cds--btn {
   color: var(--accent-primary, #0f62fe) !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  padding: 10px 20px 10px 14px !important;
-  margin-bottom: 20px;
-  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 14px 6px 10px !important;
+  margin-bottom: 14px;
+  border-radius: 6px !important;
   transition: all 0.15s ease !important;
-  min-height: 40px;
+  min-height: 36px;
+  background: var(--button-bg, #f4f4f5) !important;
+  border: 1px solid transparent !important;
 }
 
 .alloc-detail-back-btn.cds--btn:hover {
@@ -755,25 +767,37 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin: 0;
+}
+
+.alloc-detail-meta {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--border-light, #f0f0f0);
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #6f6f6f);
 }
 
 .alloc-detail-badge {
-  background: #0f62fe22;
-  color: #0f62fe;
-  font-size: 11px;
+  background: var(--accent-light, #eef4ff);
+  color: var(--accent-primary, #0f62fe);
+  font-size: 0.6875rem;
   font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 4px;
+  padding: 3px 10px;
+  border-radius: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .alloc-detail-name {
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 700;
   color: var(--text-primary, #161616);
   margin: 0;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
 }
 
 /* Cost cards */

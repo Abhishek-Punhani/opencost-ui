@@ -326,6 +326,116 @@ body .page-container {
   z-index: 1000;
 }
 
+/* ═══════════════════════════════════════════════════════
+   Page Header — Unified across all pages
+   ═══════════════════════════════════════════════════════ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  gap: 1rem;
+  min-height: 56px;
+}
+
+.page-header__left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.page-header__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.page-header__subtitle {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.page-header__breadcrumbs {
+  font-size: 0.8125rem;
+}
+
+.page-header__right {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    gap: 0.625rem;
+  }
+  .page-header__right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* ── Shared compact header checkboxes ─────────────── */
+.alloc-header-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6f6f6f);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.alloc-header-check:hover {
+  background: var(--bg-hover, #f8faff);
+  color: var(--text-primary, #161616);
+}
+
+.alloc-header-check input[type="checkbox"] {
+  accent-color: var(--accent-primary, #0f62fe);
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.alloc-header-check span {
+  line-height: 1;
+}
+
+/* ── Shared header divider ────────────────────────── */
+.alloc-header-divider,
+.assets-header-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-color, #e0e0e0);
+  margin: 0 1px;
+  flex-shrink: 0;
+}
+
 /* Responsive layout adjustments */
 @media (max-width: 768px) {
   body {

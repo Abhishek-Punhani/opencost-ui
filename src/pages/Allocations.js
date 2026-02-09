@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Dropdown, Checkbox, Button } from "@carbon/react";
+import { Dropdown, Button } from "@carbon/react";
 import {
   BarChart,
   Bar,
@@ -870,19 +870,21 @@ const AllocationDetail = ({
 
   return (
     <div className="alloc-detail">
-      <Button
-        kind="ghost"
-        size="md"
-        renderIcon={ArrowLeft}
-        onClick={onBack}
-        className="alloc-detail-back-btn"
-      >
-        Back to {aggregateBy}s
-      </Button>
+      <div className="alloc-detail-top">
+        <Button
+          kind="ghost"
+          size="md"
+          renderIcon={ArrowLeft}
+          onClick={onBack}
+          className="alloc-detail-back-btn"
+        >
+          Back to {aggregateBy}s
+        </Button>
 
-      <div className="alloc-detail-header">
-        <span className="alloc-detail-badge">{aggregateBy}</span>
-        <h2 className="alloc-detail-name">{alloc.name}</h2>
+        <div className="alloc-detail-header">
+          <span className="alloc-detail-badge">{aggregateBy}</span>
+          <h2 className="alloc-detail-name">{alloc.name}</h2>
+        </div>
       </div>
 
       {/* Cost cards */}
@@ -1654,18 +1656,26 @@ const Allocations = () => {
 
           <div className="alloc-header-divider" />
 
-          <Checkbox
-            id="alloc-idle"
-            labelText="Include idle"
-            checked={includeIdle}
-            onChange={(_, { checked }) => setIncludeIdle(checked)}
-          />
-          <Checkbox
-            id="alloc-autorefresh"
-            labelText="Auto-refresh"
-            checked={autoRefresh}
-            onChange={(_, { checked }) => setAutoRefresh(checked)}
-          />
+          <label
+            className="alloc-header-check"
+            title="Include idle cost allocations"
+          >
+            <input
+              type="checkbox"
+              checked={includeIdle}
+              onChange={(e) => setIncludeIdle(e.target.checked)}
+            />
+            <span>Idle</span>
+          </label>
+
+          <label className="alloc-header-check" title="Auto-refresh every 60s">
+            <input
+              type="checkbox"
+              checked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+            />
+            <span>Auto-refresh</span>
+          </label>
 
           <button
             className="assets-refresh-btn"

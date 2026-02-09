@@ -7,24 +7,15 @@ const Header = (props) => {
   const { title, breadcrumbs, headerTitle } = props;
 
   return (
-    <div
-      style={{
-        alignItems: "center",
-        display: "flex",
-        flexFlow: "row",
-        width: "100%",
-        marginTop: "10px",
-        flexWrap: "wrap",
-        gap: "1rem",
-      }}
-    >
-      <Typography variant="h3" style={{ marginBottom: "10px" }}>
-        {headerTitle}
-      </Typography>
-      <div style={{ flex: "1 0 auto" }}>
-        {title && <Typography variant="h4">{title}</Typography>}
+    <div className="page-header">
+      <div className="page-header__left">
+        <h1 className="page-header__title">{headerTitle}</h1>
+        {title && <span className="page-header__subtitle">{title}</span>}
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <Breadcrumbs aria-label="breadcrumb">
+          <Breadcrumbs
+            aria-label="breadcrumb"
+            className="page-header__breadcrumbs"
+          >
             {breadcrumbs.slice(0, breadcrumbs.length - 1).map((b) => (
               <Link color="inherit" href={b.href} key={b.name}>
                 {b.name}
@@ -36,14 +27,7 @@ const Header = (props) => {
           </Breadcrumbs>
         )}
       </div>
-      <div
-        style={{
-          flex: "0 0 auto",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.75rem",
-        }}
-      >
+      <div className="page-header__right">
         <ThemeToggle />
         {props.children}
       </div>

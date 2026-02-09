@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Dropdown, Checkbox } from "@carbon/react";
+import { Dropdown } from "@carbon/react";
 
 import Page from "../components/Page";
 import Header from "../components/Header";
@@ -312,16 +312,13 @@ const Assets = () => {
             }
             size="sm"
           />
-          <label
-            className="assets-refresh-toggle"
-            title="Auto-refresh every 60s"
-          >
-            <Checkbox
-              id="auto-refresh-checkbox"
-              labelText="Auto-refresh"
+          <label className="alloc-header-check" title="Auto-refresh every 60s">
+            <input
+              type="checkbox"
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
             />
+            <span>Auto-refresh</span>
           </label>
           <button
             className="assets-refresh-btn"
