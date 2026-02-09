@@ -27,8 +27,8 @@
 }
 
 .alloc-header-controls .cds--list-box {
-  min-height: 32px;
-  max-height: 32px;
+  min-height: 36px;
+  max-height: 36px;
 }
 
 .alloc-header-divider {
@@ -40,23 +40,43 @@
 }
 
 .currency-select {
-  background: var(--button-bg, #f4f4f5);
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--dropdown-bg, #ffffff);
   color: var(--text-primary, #161616);
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 6px;
-  padding: 5px 8px;
-  font-size: 12px;
+  border: 1px solid var(--dropdown-border, #d1d5db);
+  border-radius: 8px;
+  padding: 6px 32px 6px 12px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
-  min-width: 80px;
-  height: 32px;
+  min-width: 90px;
+  height: 36px;
   transition:
-    background 0.15s ease,
-    border-color 0.15s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
 }
 
 .currency-select:hover {
-  background: var(--button-hover-bg, #e5e5e5);
-  border-color: var(--border-hover, #d1d5db);
+  border-color: var(--dropdown-border-hover, #9ca3af);
+}
+
+.currency-select:focus {
+  outline: none;
+  border-color: var(--accent-primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--dropdown-focus-ring, rgba(59, 130, 246, 0.25));
+}
+
+.currency-select option {
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  background: var(--dropdown-menu-bg, #ffffff);
+  color: var(--dropdown-menu-text, #374151);
 }
 
 .rates-badge {
@@ -477,7 +497,8 @@
 .alloc-tbl {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .alloc-tbl thead {
@@ -487,12 +508,12 @@
 }
 
 .alloc-tbl th {
-  padding: 10px 14px;
+  padding: 14px 18px;
   text-align: left;
   font-weight: 600;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   color: var(--text-secondary, #6f6f6f);
   background: var(--table-header-bg, #f4f4f4);
   border-bottom: 2px solid var(--border-color, #e0e0e0);
@@ -536,8 +557,11 @@
 }
 
 .alloc-tbl-row {
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
-  transition: all 0.15s ease;
+  border-bottom: 1px solid var(--border-light, #f0f0f0);
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+  height: 52px;
 }
 
 .alloc-tbl-row--clickable {
@@ -567,8 +591,8 @@
 }
 
 .alloc-td-name {
-  padding: 10px 14px;
-  max-width: 280px;
+  padding: 14px 18px;
+  max-width: 300px;
 }
 
 .alloc-name {
@@ -578,6 +602,8 @@
   white-space: nowrap;
   color: var(--text-primary, #161616);
   font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.4;
   transition: color 0.15s ease;
 }
 
@@ -586,9 +612,10 @@
 }
 
 .alloc-td-cost {
-  padding: 10px 14px;
+  padding: 14px 18px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+  font-size: 0.875rem;
   color: var(--text-primary, #161616);
   white-space: nowrap;
 }
@@ -599,7 +626,7 @@
 }
 
 .alloc-td-arrow {
-  padding: 10px 8px;
+  padding: 14px 10px;
   text-align: center;
   font-size: 16px;
   color: var(--text-secondary, #6f6f6f);

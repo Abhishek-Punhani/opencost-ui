@@ -1,13 +1,6 @@
 @import "../../node_modules/material-design-icons-iconfont/dist/material-design-icons.css";
 @import "./theme-variables.css";
 
-/* ═══════════════════════════════════════════════════════════════════
-   Carbon Design System Overrides - Professional Dark Mode Theme
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* ─────────────────────────────────────────────────────────────────
-   Sidebar Navigation — Clean & professional (text + icon clarity)
-   ───────────────────────────────────────────────────────────────── */
 .cds--side-nav {
   background-color: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
@@ -76,18 +69,24 @@
   letter-spacing: 0.01em;
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   Dropdown & List Box Components
-   ───────────────────────────────────────────────────────────────── */
+/* Wrapper — allow menu to overflow beyond trigger width */
+.cds--dropdown__wrapper,
+.cds--list-box__wrapper {
+  position: relative;
+}
+
+/* Trigger button */
 .cds--dropdown,
 .cds--list-box {
   background-color: var(--dropdown-bg) !important;
   border: 1px solid var(--dropdown-border) !important;
-  border-radius: 6px;
-  min-height: 32px;
+  border-radius: 8px;
+  min-height: 36px;
+  overflow: visible !important;
   transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .cds--dropdown:hover,
@@ -99,47 +98,54 @@
 .cds--dropdown:focus-within,
 .cds--list-box:focus-within {
   border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 1px var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--dropdown-focus-ring) !important;
 }
 
+/* Field area (inside trigger) */
 .cds--list-box__field {
   background-color: transparent !important;
   border: none !important;
   color: var(--dropdown-text) !important;
-  padding: 0 12px;
-  min-height: 32px;
+  padding: 0 14px;
+  min-height: 36px;
   display: flex;
   align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 
 .cds--list-box__menu {
   background-color: var(--dropdown-menu-bg) !important;
   border: 1px solid var(--dropdown-border) !important;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.1);
+    0 4px 6px -1px rgba(0, 0, 0, 0.07),
+    0 10px 20px -2px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.03);
   margin-top: 4px;
-  padding: 4px 0;
-  max-height: 280px;
+  padding: 6px;
+  max-height: 320px;
+  min-width: 180px;
+  width: max-content;
+  min-width: max-content;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: var(--dropdown-scroll-thumb) transparent;
+  z-index: 9100;
 }
 
-/* WebKit-based browsers */
+/* Scrollbar (WebKit) */
 .cds--list-box__menu::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 6px;
 }
 .cds--list-box__menu::-webkit-scrollbar-track {
   background: transparent;
+  margin: 6px 0;
 }
 .cds--list-box__menu::-webkit-scrollbar-thumb {
   background-color: var(--dropdown-scroll-thumb);
-  border-radius: 8px;
-  border: 3px solid transparent;
-  background-clip: padding-box;
+  border-radius: 99px;
 }
 .cds--list-box__menu::-webkit-scrollbar-thumb:hover {
   background-color: var(--dropdown-scroll-thumb-hover);
@@ -169,70 +175,147 @@
 .cds--list-box__menu-item {
   background-color: transparent;
   color: var(--dropdown-menu-text) !important;
-  padding: 8px 14px;
-  margin: 2px 4px;
+  padding: 10px 16px;
+  margin: 2px 0;
   cursor: pointer;
-  transition: all 0.1s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
   font-size: 0.875rem;
-  height: auto !important; /* Allow growing for wrapped text */
-  min-height: 32px;
-  border-radius: 4px; /* Soften edges */
+  font-weight: 450;
+  letter-spacing: 0.005em;
+  line-height: 1.5;
+  height: auto !important;
+  min-height: 40px;
+  border-radius: 6px;
   border: none !important;
   outline: none !important;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
-/* Remove Carbon's default focus/selection borders */
+/* Kill every Carbon separator — pseudo-elements, borders, outlines */
 .cds--list-box__menu-item::before,
-.cds--list-box__menu-item::after {
+.cds--list-box__menu-item::after,
+.cds--list-box__menu-item__option::before,
+.cds--list-box__menu-item__option::after,
+.cds--list-box__menu-item--highlighted::before,
+.cds--list-box__menu-item--highlighted::after {
   display: none !important;
   content: none !important;
   border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
 }
 
+/* Also nuke any border-top Carbon puts directly on items */
+.cds--list-box__menu-item + .cds--list-box__menu-item {
+  border-top: none !important;
+}
+
+.cds--list-box__menu-item__option {
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* Hover */
 .cds--list-box__menu-item:hover {
   background-color: var(--dropdown-item-hover) !important;
   color: var(--dropdown-menu-text-hover) !important;
 }
 
+/* Keyboard-highlighted */
 .cds--list-box__menu-item--highlighted {
   background-color: var(--dropdown-item-hover) !important;
   color: var(--dropdown-menu-text-hover) !important;
 }
 
+/* Selected / active */
 .cds--list-box__menu-item--active,
 .cds--list-box__menu-item[aria-selected="true"] {
   background-color: var(--dropdown-item-selected) !important;
-  color: var(--dropdown-menu-text-hover) !important;
+  color: var(--dropdown-item-active-text, var(--accent-primary)) !important;
   font-weight: 600;
+  position: relative;
+}
+
+/* Accent left-bar on selected item */
+.cds--list-box__menu-item--active::before,
+.cds--list-box__menu-item[aria-selected="true"]::before {
+  display: block !important;
+  content: "" !important;
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--dropdown-item-selected-border, var(--accent-primary));
+  border: none !important;
 }
 
 .cds--list-box__menu-item--active:hover,
 .cds--list-box__menu-item[aria-selected="true"]:hover {
-  background-color: var(--dropdown-item-selected) !important;
+  background-color: var(
+    --dropdown-item-active-bg,
+    var(--dropdown-item-selected)
+  ) !important;
+  color: var(--dropdown-item-active-text, var(--accent-primary)) !important;
 }
 
+/* ── Option text inside each item (FULL text, no clipping) ── */
 .cds--list-box__menu-item__option {
   color: inherit !important;
   font-weight: inherit !important;
   text-overflow: unset !important;
-  white-space: normal !important;
+  white-space: nowrap !important;
   overflow: visible !important;
-  line-height: 1.4;
+  line-height: 1.45;
+  padding: 0 !important;
+  max-width: none !important;
+  width: auto !important;
+  height: auto !important;
 }
 
-.cds--list-box__label,
+/* ── Trigger label (selected value shown in closed state) ── */
+.cds--list-box__label {
+  color: var(--dropdown-text) !important;
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 .cds--dropdown__wrapper .cds--label {
   color: var(--text-secondary);
   font-weight: 500;
+  font-size: 0.8125rem;
 }
 
 .cds--list-box__menu-icon {
-  fill: var(--text-secondary);
+  fill: var(--text-tertiary) !important;
+  transition:
+    transform 0.2s ease,
+    fill 0.2s ease;
+  flex-shrink: 0;
 }
 
 .cds--list-box__selection {
   color: var(--text-primary);
   font-size: 13px;
+  flex-shrink: 0;
 }
 
 /* ─────────────────────────────────────────────────────────────────

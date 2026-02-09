@@ -27,6 +27,7 @@ import {
 import "../css/assets.css";
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
+const MIN_LOADING_DURATION = 250; // ms
 
 const Assets = () => {
   const routerLocation = useLocation();
@@ -107,6 +108,7 @@ const Assets = () => {
   const fetchData = useCallback(
     async (showLoading = true) => {
       if (showLoading) setLoading(true);
+      const startTime = showLoading ? Date.now() : null;
       try {
         const result = await AssetsService.fetchAssets(windowParam);
         if (!mounted.current) return;
@@ -129,7 +131,16 @@ const Assets = () => {
         console.error("Failed to fetch assets:", err);
         setAssets([]);
       } finally {
-        if (mounted.current) setLoading(false);
+        if (showLoading && startTime !== null) {
+          const elapsed = Date.now() - startTime;
+          const remaining = Math.max(0, MIN_LOADING_DURATION - elapsed);
+          if (remaining > 0) {
+            await new Promise((resolve) => setTimeout(resolve, remaining));
+          }
+        }
+        if (mounted.current && showLoading) {
+          setLoading(false);
+        }
       }
     },
     [windowParam],

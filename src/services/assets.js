@@ -484,6 +484,14 @@ class AssetsService {
    * @returns {Promise<{data: object, isMock: boolean}>}
    */
   async fetchAssets(win) {
+    // Netlify (production) deployments cannot reach the real API,
+    // so we intentionally always show mock/demo data there.
+    return {
+      data: { code: 200, data: [getMockAssets(win)] },
+      isMock: true,
+    };
+
+    /*
     const params = { window: win };
 
     try {
@@ -499,6 +507,7 @@ class AssetsService {
         isMock: true,
       };
     }
+    */
   }
 
   /**
