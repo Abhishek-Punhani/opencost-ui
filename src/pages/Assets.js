@@ -6,11 +6,12 @@ import React, {
   useCallback,
 } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Loading, Dropdown, Checkbox } from "@carbon/react";
+import { Dropdown, Checkbox } from "@carbon/react";
 
 import Page from "../components/Page";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import LoadingSkeleton from "../components/assets/LoadingSkeleton";
 import AssetsSummaryTiles from "../components/assets/AssetsSummaryTiles";
 import AssetCostChart from "../components/assets/AssetCostChart";
 import AssetsDashboard from "../components/assets/AssetsDashboard";
@@ -350,15 +351,7 @@ const Assets = () => {
         )}
 
         {loading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              padding: "50px",
-            }}
-          >
-            <Loading description="Loading assets" withOverlay={false} />
-          </div>
+          <LoadingSkeleton />
         ) : assets.length === 0 ? (
           <div className="assets-empty">
             <p>No asset data available for the selected window.</p>

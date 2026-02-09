@@ -80,11 +80,21 @@
   cursor: pointer;
   color: var(--text-secondary);
   line-height: 1;
-  transition: all 0.2s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 .assets-refresh-btn:hover {
   background: var(--button-hover-bg);
+  border-color: var(--border-hover);
   color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.assets-refresh-btn:active {
+  background: var(--bg-hover);
+  transform: translateY(0.5px);
 }
 
 /* ── Demo notification ─────────────────────────────── */
@@ -1285,21 +1295,33 @@
   gap: 5px;
   background: var(--button-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 7px 14px;
+  border-radius: 6px;
+  padding: 6px 14px;
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   color: var(--text-secondary);
   cursor: pointer;
-  box-shadow: var(--card-shadow);
-  transition: all 0.2s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
   white-space: nowrap;
 }
-.export-csv-btn:hover {
+.export-csv-btn:hover:not(:disabled) {
   background: var(--button-hover-bg);
   border-color: var(--border-hover);
   color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.export-csv-btn:active:not(:disabled) {
+  background: var(--bg-hover);
+  transform: translateY(0.5px);
+}
+.export-csv-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 .export-csv-btn svg {
   flex-shrink: 0;

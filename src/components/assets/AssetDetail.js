@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { useLocation, useNavigate } from "react-router";
+import React, { useMemo, useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 import {
   BarChart,
   Bar,
@@ -17,6 +17,7 @@ import { toCurrency } from "../../util";
 import Page from "../Page";
 import Header from "../Header";
 import Footer from "../Footer";
+import AssetsService from "../../services/assets";
 import "../../css/assets.css";
 
 const TYPE_COLORS = {
@@ -267,20 +268,108 @@ const AssetCostTrend = ({ asset, currency, windowStr }) => {
 
 /**
  * AssetDetail — full-page detail view for a single asset.
- * Receives asset data via location state.
+ * Receives asset data via location state, OR fetches it from the API
+ * when navigated to directly (deep-link / bookmark support).
  */
 const AssetDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { asset, currency, windowStr } = location.state || {};
+  const { id: routeId } = useParams();
 
-  if (!asset) {
+  // Try location.state first (from in-app navigation)
+  const stateAsset = location.state?.asset;
+  const stateCurrency = location.state?.currency || "USD";
+  const stateWindow = location.state?.windowStr || "7d";
+
+  const [asset, setAsset] = useState(stateAsset || null);
+  const [currency, setCurrency] = useState(stateCurrency);
+  const [windowStr, setWindowStr] = useState(stateWindow);
+  const [fetchLoading, setFetchLoading] = useState(!stateAsset);
+  const [fetchError, setFetchError] = useState(false);
+
+  // When no state is passed (direct navigation), fetch asset by ID
+  useEffect(() => {
+    if (stateAsset || !routeId) return;
+
+    let cancelled = false;
+    setFetchLoading(true);
+    setFetchError(false);
+
+    AssetsService.fetchAssetById(decodeURIComponent(routeId), "7d")
+      .then(({ asset: fetched }) => {
+        if (cancelled) return;
+        if (fetched) {
+          setAsset(fetched);
+        } else {
+          setFetchError(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFetchError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setFetchLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routeId, stateAsset]);
+
+  // Loading state while fetching via deep-link
+  if (fetchLoading) {
+    return (
+      <Page>
+        <Header headerTitle="Asset Detail" />
+        <div className="assets-page">
+          <div className="skeleton-wrap">
+            <div
+              className="skeleton-tiles"
+              style={{
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              }}
+            >
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="skeleton-tile">
+                  <div className="skeleton-line skeleton-line--sm" />
+                  <div className="skeleton-line skeleton-line--lg" />
+                </div>
+              ))}
+            </div>
+            <div className="skeleton-chart">
+              <div className="skeleton-chart-header">
+                <div className="skeleton-line skeleton-line--md" />
+              </div>
+              <div className="skeleton-chart-body">
+                <div className="skeleton-bars">
+                  {[65, 85, 45, 70, 90, 55, 75].map((h, i) => (
+                    <div
+                      key={i}
+                      className="skeleton-bar"
+                      style={{ height: `${h}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </Page>
+    );
+  }
+
+  if (!asset || fetchError) {
     return (
       <Page>
         <Header headerTitle="Asset Detail" />
         <div className="assets-page">
           <div className="assets-empty">
-            <p>No asset data. Please go back and select an asset.</p>
+            <p>
+              {fetchError
+                ? "Asset not found."
+                : "No asset data. Please go back and select an asset."}
+            </p>
             <button
               className="detail-back-btn"
               onClick={() => navigate("/assets")}

@@ -500,6 +500,58 @@ class AssetsService {
       };
     }
   }
+
+  /**
+   * Fetches carbon cost data from the OpenCost Assets Carbon API.
+   * Falls back to null when the endpoint is unavailable.
+   * @param {string} win - Time window (e.g., "7d", "today", "lastweek")
+   * @returns {Promise<{data: object|null, available: boolean}>}
+   */
+  async fetchCarbonAssets(win) {
+    const params = { window: win };
+
+    try {
+      const result = await client.get("/model/assets/carbon", { params });
+      return { data: result.data, available: true };
+    } catch (error) {
+      // Carbon endpoint may not be available yet — that's expected
+      console.info("Carbon assets API not available:", error.message);
+      return { data: null, available: false };
+    }
+  }
+
+  /**
+   * Fetches a single asset by its full ID key.
+   * Calls the regular assets endpoint and filters to the matching key.
+   * Used for deep-link / direct-navigation support.
+   * @param {string} assetId - The full asset key string
+   * @param {string} win - Time window (defaults to "7d")
+   * @returns {Promise<{asset: object|null, isMock: boolean}>}
+   */
+  async fetchAssetById(assetId, win = "7d") {
+    const result = await this.fetchAssets(win);
+    const raw = result.data;
+    if (raw && raw.data && Array.isArray(raw.data) && raw.data.length > 0) {
+      const assetMap = raw.data[0];
+      if (assetMap[assetId]) {
+        return {
+          asset: { ...assetMap[assetId], _id: assetId },
+          isMock: result.isMock,
+        };
+      }
+      // Fallback: try matching by name
+      const entry = Object.entries(assetMap).find(
+        ([, a]) => a.properties?.name === decodeURIComponent(assetId),
+      );
+      if (entry) {
+        return {
+          asset: { ...entry[1], _id: entry[0] },
+          isMock: result.isMock,
+        };
+      }
+    }
+    return { asset: null, isMock: result.isMock };
+  }
 }
 
 export default new AssetsService();

@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Loading, Dropdown, Checkbox, Button } from "@carbon/react";
+import { Dropdown, Checkbox, Button } from "@carbon/react";
 import {
   BarChart,
   Bar,
@@ -26,6 +26,7 @@ import {
 import Page from "../components/Page";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import AllocationSkeleton from "../components/AllocationSkeleton";
 import { ArrowLeft } from "@carbon/icons-react";
 import AllocationService from "../services/allocation.service";
 import {
@@ -257,6 +258,8 @@ const AllocationCostChart = ({
   cumData,
   currency,
   aggregateBy,
+  accumulate,
+  onAccumulateChange,
 }) => {
   const [showCumulative, setShowCumulative] = useState(false);
 
@@ -336,16 +339,34 @@ const AllocationCostChart = ({
     <div className="alloc-chart-card">
       <div className="alloc-chart-head">
         <h3 className="alloc-chart-title">Cost by {aggregateBy}</h3>
-        {chartData && (
-          <label className="alloc-chart-toggle">
-            <input
-              type="checkbox"
-              checked={showCumulative}
-              onChange={(e) => setShowCumulative(e.target.checked)}
-            />
-            <span>Cumulative</span>
-          </label>
-        )}
+        <div className="alloc-chart-controls">
+          {chartData && (
+            <label className="alloc-chart-toggle">
+              <input
+                type="checkbox"
+                checked={showCumulative}
+                onChange={(e) => setShowCumulative(e.target.checked)}
+              />
+              <span>Cumulative</span>
+            </label>
+          )}
+          <div className="assets-view-toggle">
+            <button
+              className={`view-toggle-btn ${!accumulate ? "active" : ""}`}
+              onClick={() => onAccumulateChange(false)}
+              title="Daily"
+            >
+              <span>Daily</span>
+            </button>
+            <button
+              className={`view-toggle-btn ${accumulate ? "active" : ""}`}
+              onClick={() => onAccumulateChange(true)}
+              title="Entire window"
+            >
+              <span>Entire window</span>
+            </button>
+          </div>
+        </div>
       </div>
       <div className="alloc-chart-body">
         {chartData && !showCumulative && (
@@ -1631,28 +1652,6 @@ const Allocations = () => {
             size="sm"
           />
 
-          {/* Resolution */}
-          <Dropdown
-            id="alloc-res"
-            titleText=""
-            label={accumulate ? "Entire window" : "Daily"}
-            items={[
-              { name: "Daily", value: false },
-              { name: "Entire window", value: true },
-            ]}
-            itemToString={(i) => (i ? i.name : "")}
-            selectedItem={
-              accumulate
-                ? { name: "Entire window", value: true }
-                : { name: "Daily", value: false }
-            }
-            onChange={({ selectedItem }) =>
-              selectedItem !== undefined &&
-              updateParams({ acc: String(selectedItem.value) })
-            }
-            size="sm"
-          />
-
           <div className="alloc-header-divider" />
 
           <Checkbox
@@ -1696,15 +1695,7 @@ const Allocations = () => {
         )}
 
         {loading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              padding: "50px",
-            }}
-          >
-            <Loading description="Loading allocations" withOverlay={false} />
-          </div>
+          <AllocationSkeleton />
         ) : convertedCumData.length === 0 ? (
           <div className="alloc-empty">
             <p>No allocation data available for the selected window.</p>
@@ -1730,6 +1721,8 @@ const Allocations = () => {
               cumData={convertedCumData}
               currency={currency}
               aggregateBy={aggregateBy}
+              accumulate={accumulate}
+              onAccumulateChange={(val) => updateParams({ acc: String(val) })}
             />
 
             <AllocationTable
