@@ -33,12 +33,39 @@
 
   --sidebar-bg: #ffffff;
   --sidebar-border: #e5e7eb;
+  --sidebar-text: #393939;
+  --sidebar-text-hover: #0f62fe;
+  --sidebar-text-active: #0f62fe;
+  --sidebar-hover: #f4f4f4;
+  --sidebar-active: #eef4ff;
+
+  /* Dropdown colors - light */
+  --dropdown-bg: #ffffff;
+  --dropdown-border: #d1d5db;
+  --dropdown-border-hover: #a3a3a3;
+  --dropdown-text: #1a1a1a;
+  --dropdown-menu-bg: #ffffff;
+  --dropdown-menu-text: #1a1a1a;
+  --dropdown-menu-text-hover: #0f62fe;
+  --dropdown-item-hover: #f4f4f4;
+  --dropdown-item-selected: #eef4ff;
+  --dropdown-item-border: #f0f0f0;
+  /* Dropdown scrollbar */
+  --dropdown-scroll-thumb: rgba(0, 0, 0, 0.18);
+  --dropdown-scroll-thumb-hover: rgba(0, 0, 0, 0.28);
 
   /* Chart colors - light */
   --chart-grid: #e5e7eb;
   --chart-text: #737373;
   --chart-tooltip-bg: #ffffff;
   --chart-tooltip-border: #e5e7eb;
+
+  /* Skeleton colors - light */
+  --skeleton-base: #e8e8e8;
+  --skeleton-shine: #f5f5f5;
+
+  /* Success color */
+  --success-color: #42be65;
 }
 
 [data-theme="dark"] {
@@ -75,14 +102,42 @@
 
   --sidebar-bg: #141414;
   --sidebar-border: #2a2a2a;
-  --sidebar-hover: #222222;
+  --sidebar-text: #e6e6e6; /* brighter for legibility */
+  --sidebar-text-hover: #ffffff;
+  --sidebar-text-active: var(--accent-primary);
+  --sidebar-icon: #cfcfcf;
+  --sidebar-icon-active: var(--accent-primary);
+  --sidebar-hover: rgba(255, 255, 255, 0.02);
+  --sidebar-active-bg: rgba(106, 163, 255, 0.06);
   --sidebar-active: #2a2a2a;
+
+  /* Dropdown colors - dark */
+  --dropdown-bg: #262626;
+  --dropdown-border: #404040;
+  --dropdown-border-hover: #525252;
+  --dropdown-text: #ececec;
+  --dropdown-menu-bg: #2a2a2a;
+  --dropdown-menu-text: #ececec;
+  --dropdown-menu-text-hover: #ffffff;
+  --dropdown-item-hover: #3a3a3a;
+  --dropdown-item-selected: #1a3a5a;
+  --dropdown-item-border: #333333;
+  /* Dropdown scrollbar - dark */
+  --dropdown-scroll-thumb: #525252;
+  --dropdown-scroll-thumb-hover: #6b6b6b;
 
   /* Chart colors - dark */
   --chart-grid: #2a2a2a;
   --chart-text: #b4b4b4;
   --chart-tooltip-bg: #1e1e1e;
   --chart-tooltip-border: #3a3a3a;
+
+  /* Skeleton colors - dark */
+  --skeleton-base: #2a2a2a;
+  --skeleton-shine: #3a3a3a;
+
+  /* Success color */
+  --success-color: #42be65;
 }
 
 /* Smooth transitions for theme changes */

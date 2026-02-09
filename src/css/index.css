@@ -1,24 +1,228 @@
 @import "../../node_modules/material-design-icons-iconfont/dist/material-design-icons.css";
 @import "./theme-variables.css";
 
-/* Carbon Design System overrides */
+/* ═══════════════════════════════════════════════════════════════════
+   Carbon Design System Overrides - Professional Dark Mode Theme
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────
+   Sidebar Navigation — Clean & professional (text + icon clarity)
+   ───────────────────────────────────────────────────────────────── */
 .cds--side-nav {
   background-color: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
 }
 
-.cds--side-nav__link--current,
-.cds--side-nav__link:hover {
-  background-color: var(--bg-hover);
+.cds--side-nav__link {
+  color: var(--sidebar-text);
+  font-weight: 500;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
 }
 
+.cds--side-nav__link .cds--side-nav__icon,
+.cds--side-nav__link svg {
+  color: var(--sidebar-icon);
+  fill: currentColor;
+  width: 18px;
+  height: 18px;
+  opacity: 1;
+}
+
+.cds--side-nav__link:hover {
+  background-color: var(--sidebar-hover);
+  color: var(--sidebar-text-hover);
+}
+.cds--side-nav__link:hover .cds--side-nav__icon,
+.cds--side-nav__link:hover svg {
+  color: var(--sidebar-icon-active);
+}
+
+.cds--side-nav__link--current {
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-text-active);
+  border-left: 4px solid var(--sidebar-text-active);
+  padding-left: calc(1rem - 4px);
+}
+.cds--side-nav__link--current .cds--side-nav__icon,
+.cds--side-nav__link--current svg {
+  color: var(--sidebar-icon-active);
+}
+
+/* focus / keyboard accessibility */
+.cds--side-nav__link:focus-visible {
+  outline: 3px solid rgba(106, 163, 255, 0.14);
+  outline-offset: 2px;
+}
+
+.cds--side-nav__link-text {
+  color: inherit;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Dropdown & List Box Components
+   ───────────────────────────────────────────────────────────────── */
 .cds--dropdown,
+.cds--list-box {
+  background-color: var(--dropdown-bg);
+  border-color: var(--dropdown-border);
+}
+
+.cds--dropdown:hover,
+.cds--list-box:hover {
+  background-color: var(--dropdown-bg);
+  border-color: var(--dropdown-border-hover);
+}
+
+.cds--list-box__field {
+  background-color: var(--dropdown-bg);
+  border-color: var(--dropdown-border);
+  color: var(--dropdown-text);
+}
+
+.cds--list-box__menu {
+  background-color: var(--dropdown-menu-bg);
+  border: 1px solid var(--dropdown-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  /* make scrollbar subtle and dark-mode friendly */
+  scrollbar-width: thin;
+  scrollbar-color: var(--dropdown-scroll-thumb) transparent;
+}
+
+/* WebKit-based browsers */
+.cds--list-box__menu::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.cds--list-box__menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cds--list-box__menu::-webkit-scrollbar-thumb {
+  background-color: var(--dropdown-scroll-thumb);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.cds--list-box__menu::-webkit-scrollbar-thumb:hover {
+  background-color: var(--dropdown-scroll-thumb-hover);
+}
+
+/* Table scrollbars (assets table) */
+.table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--dropdown-scroll-thumb) transparent;
+}
+.table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--dropdown-scroll-thumb);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--dropdown-scroll-thumb-hover);
+}
+
+.cds--list-box__menu-item {
+  background-color: var(--dropdown-menu-bg);
+  color: var(--dropdown-menu-text);
+  border-bottom: 1px solid var(--dropdown-item-border);
+}
+
+.cds--list-box__menu-item:hover {
+  background-color: var(--dropdown-item-hover);
+  color: var(--dropdown-menu-text-hover);
+}
+
+.cds--list-box__menu-item--highlighted,
+.cds--list-box__menu-item--active {
+  background-color: var(--dropdown-item-selected);
+  color: var(--dropdown-menu-text-hover);
+}
+
+.cds--list-box__menu-item__option {
+  color: inherit;
+}
+
+.cds--list-box__label,
+.cds--dropdown__wrapper .cds--label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Checkbox Components
+   ───────────────────────────────────────────────────────────────── */
 .cds--checkbox-wrapper {
   background: transparent;
 }
 
+.cds--checkbox-label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.cds--checkbox-label-text {
+  color: var(--text-primary);
+}
+
+.cds--checkbox:checked + .cds--checkbox-label::before {
+  background-color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Modal Components
+   ───────────────────────────────────────────────────────────────── */
 .cds--modal-container {
   background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.cds--modal-header {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cds--modal-content {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.cds--modal-header__heading {
+  color: var(--text-primary);
+}
+
+.cds--modal-close {
+  color: var(--text-primary);
+}
+
+.cds--modal-close:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Loading Spinner
+   ───────────────────────────────────────────────────────────────── */
+.cds--loading__stroke {
+  stroke: var(--accent-primary);
+}
+
+.cds--loading-overlay {
+  background-color: var(--bg-primary);
 }
 
 body {
