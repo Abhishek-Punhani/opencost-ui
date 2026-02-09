@@ -14,57 +14,66 @@
 }
 
 .cds--side-nav__link {
-  color: var(--sidebar-text);
+  color: var(--sidebar-text) !important;
   font-weight: 500;
-  opacity: 1;
+  opacity: 1 !important;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.625rem 1rem;
+  padding: 0.75rem 1rem;
+  margin: 2px 8px;
+  border-radius: 6px;
   transition:
-    background-color 0.12s ease,
-    color 0.12s ease;
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .cds--side-nav__link .cds--side-nav__icon,
 .cds--side-nav__link svg {
-  color: var(--sidebar-icon);
+  color: var(--sidebar-icon, var(--sidebar-text)) !important;
   fill: currentColor;
   width: 18px;
   height: 18px;
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .cds--side-nav__link:hover {
-  background-color: var(--sidebar-hover);
-  color: var(--sidebar-text-hover);
+  background-color: var(--sidebar-hover) !important;
+  color: var(--sidebar-text-hover) !important;
 }
 .cds--side-nav__link:hover .cds--side-nav__icon,
 .cds--side-nav__link:hover svg {
-  color: var(--sidebar-icon-active);
+  color: var(--sidebar-icon-active, var(--sidebar-text-hover)) !important;
 }
 
-.cds--side-nav__link--current {
-  background-color: var(--sidebar-active-bg);
-  color: var(--sidebar-text-active);
-  border-left: 4px solid var(--sidebar-text-active);
-  padding-left: calc(1rem - 4px);
+.cds--side-nav__link--current,
+.cds--side-nav__link[aria-current="page"] {
+  background-color: var(--sidebar-active-bg) !important;
+  color: var(--sidebar-text-active) !important;
+  border-left: 3px solid var(--sidebar-text-active);
+  padding-left: calc(1rem - 3px);
+  font-weight: 600;
 }
 .cds--side-nav__link--current .cds--side-nav__icon,
-.cds--side-nav__link--current svg {
-  color: var(--sidebar-icon-active);
+.cds--side-nav__link--current svg,
+.cds--side-nav__link[aria-current="page"] .cds--side-nav__icon,
+.cds--side-nav__link[aria-current="page"] svg {
+  color: var(--sidebar-icon-active) !important;
 }
 
 /* focus / keyboard accessibility */
 .cds--side-nav__link:focus-visible {
-  outline: 3px solid rgba(106, 163, 255, 0.14);
-  outline-offset: 2px;
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 1px;
 }
 
 .cds--side-nav__link-text {
-  color: inherit;
-  font-size: 0.95rem;
-  line-height: 1.2;
+  color: inherit !important;
+  font-size: 0.875rem;
+  font-weight: inherit;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -72,27 +81,48 @@
    ───────────────────────────────────────────────────────────────── */
 .cds--dropdown,
 .cds--list-box {
-  background-color: var(--dropdown-bg);
-  border-color: var(--dropdown-border);
+  background-color: var(--dropdown-bg) !important;
+  border: 1px solid var(--dropdown-border) !important;
+  border-radius: 6px;
+  min-height: 32px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .cds--dropdown:hover,
 .cds--list-box:hover {
-  background-color: var(--dropdown-bg);
-  border-color: var(--dropdown-border-hover);
+  background-color: var(--dropdown-bg) !important;
+  border-color: var(--dropdown-border-hover) !important;
+}
+
+.cds--dropdown:focus-within,
+.cds--list-box:focus-within {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 1px var(--accent-primary);
 }
 
 .cds--list-box__field {
-  background-color: var(--dropdown-bg);
-  border-color: var(--dropdown-border);
-  color: var(--dropdown-text);
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--dropdown-text) !important;
+  padding: 0 12px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
 }
 
 .cds--list-box__menu {
-  background-color: var(--dropdown-menu-bg);
-  border: 1px solid var(--dropdown-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  /* make scrollbar subtle and dark-mode friendly */
+  background-color: var(--dropdown-menu-bg) !important;
+  border: 1px solid var(--dropdown-border) !important;
+  border-radius: 8px;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  padding: 4px 0;
+  max-height: 280px;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--dropdown-scroll-thumb) transparent;
 }
@@ -137,30 +167,72 @@
 }
 
 .cds--list-box__menu-item {
-  background-color: var(--dropdown-menu-bg);
-  color: var(--dropdown-menu-text);
-  border-bottom: 1px solid var(--dropdown-item-border);
+  background-color: transparent;
+  color: var(--dropdown-menu-text) !important;
+  padding: 8px 14px;
+  margin: 2px 4px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  font-size: 0.875rem;
+  height: auto !important; /* Allow growing for wrapped text */
+  min-height: 32px;
+  border-radius: 4px; /* Soften edges */
+  border: none !important;
+  outline: none !important;
+}
+
+/* Remove Carbon's default focus/selection borders */
+.cds--list-box__menu-item::before,
+.cds--list-box__menu-item::after {
+  display: none !important;
+  content: none !important;
+  border: none !important;
 }
 
 .cds--list-box__menu-item:hover {
-  background-color: var(--dropdown-item-hover);
-  color: var(--dropdown-menu-text-hover);
+  background-color: var(--dropdown-item-hover) !important;
+  color: var(--dropdown-menu-text-hover) !important;
 }
 
-.cds--list-box__menu-item--highlighted,
-.cds--list-box__menu-item--active {
-  background-color: var(--dropdown-item-selected);
-  color: var(--dropdown-menu-text-hover);
+.cds--list-box__menu-item--highlighted {
+  background-color: var(--dropdown-item-hover) !important;
+  color: var(--dropdown-menu-text-hover) !important;
+}
+
+.cds--list-box__menu-item--active,
+.cds--list-box__menu-item[aria-selected="true"] {
+  background-color: var(--dropdown-item-selected) !important;
+  color: var(--dropdown-menu-text-hover) !important;
+  font-weight: 600;
+}
+
+.cds--list-box__menu-item--active:hover,
+.cds--list-box__menu-item[aria-selected="true"]:hover {
+  background-color: var(--dropdown-item-selected) !important;
 }
 
 .cds--list-box__menu-item__option {
-  color: inherit;
+  color: inherit !important;
+  font-weight: inherit !important;
+  text-overflow: unset !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  line-height: 1.4;
 }
 
 .cds--list-box__label,
 .cds--dropdown__wrapper .cds--label {
   color: var(--text-secondary);
   font-weight: 500;
+}
+
+.cds--list-box__menu-icon {
+  fill: var(--text-secondary);
+}
+
+.cds--list-box__selection {
+  color: var(--text-primary);
+  font-size: 13px;
 }
 
 /* ─────────────────────────────────────────────────────────────────

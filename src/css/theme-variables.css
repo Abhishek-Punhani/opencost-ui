@@ -33,10 +33,13 @@
 
   --sidebar-bg: #ffffff;
   --sidebar-border: #e5e7eb;
-  --sidebar-text: #393939;
+  --sidebar-text: #161616;
   --sidebar-text-hover: #0f62fe;
   --sidebar-text-active: #0f62fe;
-  --sidebar-hover: #f4f4f4;
+  --sidebar-icon: #525252;
+  --sidebar-icon-active: #0f62fe;
+  --sidebar-hover: #eef4ff;
+  --sidebar-active-bg: #dbeafe;
   --sidebar-active: #eef4ff;
 
   /* Dropdown colors - light */
@@ -98,17 +101,17 @@
   --card-hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 
   --table-header-bg: #1e1e1e;
-  --table-row-hover: #242424;
+  --table-row-hover: #2e2e2e;
 
   --sidebar-bg: #141414;
   --sidebar-border: #2a2a2a;
-  --sidebar-text: #e6e6e6; /* brighter for legibility */
+  --sidebar-text: #f4f4f4;
   --sidebar-text-hover: #ffffff;
   --sidebar-text-active: var(--accent-primary);
-  --sidebar-icon: #cfcfcf;
+  --sidebar-icon: #d0d0d0;
   --sidebar-icon-active: var(--accent-primary);
-  --sidebar-hover: rgba(255, 255, 255, 0.02);
-  --sidebar-active-bg: rgba(106, 163, 255, 0.06);
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-active-bg: rgba(106, 163, 255, 0.14);
   --sidebar-active: #2a2a2a;
 
   /* Dropdown colors - dark */
@@ -119,7 +122,7 @@
   --dropdown-menu-bg: #2a2a2a;
   --dropdown-menu-text: #ececec;
   --dropdown-menu-text-hover: #ffffff;
-  --dropdown-item-hover: #3a3a3a;
+  --dropdown-item-hover: #404040;
   --dropdown-item-selected: #1a3a5a;
   --dropdown-item-border: #333333;
   /* Dropdown scrollbar - dark */
