@@ -176,28 +176,27 @@ const CloudCosts = () => {
     setCurrency(searchParams.get("currency") || "USD");
   }, [routerLocation]);
 
-  // Initialize once, then fetch report each time setFetch(true) is called
+  // Initialize on mount
   React.useEffect(() => {
-    if (!init) {
-      initialize();
-    }
-    if (init || fetch) {
-      fetchData();
-    }
-  }, [init, fetch]);
+    if (!init) initialize();
+  }, []);
 
+  // Fetch data whenever query parameters change
   React.useEffect(() => {
-    setFetch(!fetch);
+    fetchData();
     setTitle(generateTitle({ window, aggregateBy, costMetric }));
   }, [window, aggregateBy, costMetric, filters]);
 
   React.useEffect(() => {
     // Update currency warning whenever currency changes
     if (currency !== "USD") {
-      setErrors([{
-        primary: "Currency Conversion in Use",
-        secondary: "Forex rates may differ between the API and your cloud provider, potentially causing cost discrepancies. Always verify with your actual cloud bill."
-      }]);
+      setErrors([
+        {
+          primary: "Currency Conversion in Use",
+          secondary:
+            "Forex rates may differ between the API and your cloud provider, potentially causing cost discrepancies. Always verify with your actual cloud bill.",
+        },
+      ]);
     } else {
       setErrors([]);
     }
@@ -228,7 +227,7 @@ const CloudCosts = () => {
   return (
     <Page active="cloud.html">
       <Header headerTitle="Cloud Costs">
-        <IconButton aria-label="refresh" onClick={() => setFetch(true)}>
+        <IconButton aria-label="refresh" onClick={() => fetchData()}>
           <RefreshIcon />
         </IconButton>
       </Header>
@@ -247,7 +246,14 @@ const CloudCosts = () => {
 
       {init && hasCloudCostEnabled && (
         <Paper id="cloud-cost">
-          <div style={{ display: "flex", flexFlow: "row", padding: 24 }}>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "row wrap",
+              padding: 24,
+              gap: 16,
+            }}
+          >
             <div style={{ flexGrow: 1 }}>
               <Typography variant="h5">{title}</Typography>
               <Subtitle report={{ window, aggregateBy }} />
@@ -331,4 +337,4 @@ const CloudCosts = () => {
   );
 };
 
-export default React.memo(CloudCosts);
+export default CloudCosts;

@@ -32,17 +32,108 @@ function generateDailySnapshots(totalCost, days, startDate, extra = {}) {
 }
 
 /**
+ * Compute a { start, end, days } range from a window string.
+ * Mirrors the real OpenCost API behaviour for each window keyword.
+ */
+function windowToRange(win) {
+  const now = new Date();
+  now.setUTCHours(0, 0, 0, 0);
+
+  let start, end, days;
+
+  switch (win) {
+    case "today": {
+      start = new Date(now);
+      end = new Date(now);
+      end.setUTCDate(end.getUTCDate() + 1);
+      days = 1;
+      break;
+    }
+    case "yesterday": {
+      end = new Date(now);
+      start = new Date(now);
+      start.setUTCDate(start.getUTCDate() - 1);
+      days = 1;
+      break;
+    }
+    case "24h": {
+      end = new Date(now);
+      end.setUTCDate(end.getUTCDate() + 1);
+      start = new Date(now);
+      days = 1;
+      break;
+    }
+    case "48h": {
+      end = new Date(now);
+      end.setUTCDate(end.getUTCDate() + 1);
+      start = new Date(now);
+      start.setUTCDate(start.getUTCDate() - 1);
+      days = 2;
+      break;
+    }
+    case "week": {
+      start = new Date(now);
+      start.setUTCDate(start.getUTCDate() - start.getUTCDay());
+      end = new Date(now);
+      end.setUTCDate(end.getUTCDate() + 1);
+      days = Math.max(1, Math.ceil((end - start) / 86400000));
+      break;
+    }
+    case "lastweek": {
+      end = new Date(now);
+      end.setUTCDate(end.getUTCDate() - end.getUTCDay());
+      start = new Date(end);
+      start.setUTCDate(start.getUTCDate() - 7);
+      days = 7;
+      break;
+    }
+    case "14d": {
+      end = new Date(now);
+      end.setUTCDate(end.getUTCDate() + 1);
+      start = new Date(now);
+      start.setUTCDate(start.getUTCDate() - 13);
+      days = 14;
+      break;
+    }
+    case "7d":
+    default: {
+      end = new Date(now);
+      end.setUTCDate(end.getUTCDate() + 1);
+      start = new Date(now);
+      start.setUTCDate(start.getUTCDate() - 6);
+      days = 7;
+      break;
+    }
+  }
+
+  return {
+    start,
+    end,
+    days,
+    winStart: start.toISOString(),
+    winEnd: end.toISOString(),
+  };
+}
+
+/**
+ * Scale a base 7-day cost to the requested window duration.
+ * This gives visually different data for each window.
+ */
+function scaleCost(baseCost, days) {
+  return Number(((baseCost / 7) * days).toFixed(4));
+}
+
+/**
  * Mock asset data matching the real /assets API response format.
  * Covers all 6 asset types: Node, Disk, LoadBalancer, Network, Cloud, ClusterManagement.
  * Structure mirrors: https://www.opencost.io/docs/integrations/api-examples#assets-example
  *
  * Each asset now includes a `dailyCosts` array with timestamped cost data for charts.
+ * The window parameter controls the date range and scales costs accordingly.
  */
-function getMockAssets() {
-  const winStart = "2026-02-01T00:00:00Z";
-  const winEnd = "2026-02-08T00:00:00Z";
-  const startD = new Date(winStart);
-  const days = 7;
+function getMockAssets(win) {
+  const { start: startD, days, winStart, winEnd } = windowToRange(win);
+  const minutes = days * 1440;
 
   return {
     "GCP/__undefined__/demo-project/Compute/demo-cluster/Node/Kubernetes/gke-demo-pool-a1b2c3d4-x1y2/gke-demo-pool-a1b2c3d4-x1y2":
@@ -69,33 +160,38 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
+        minutes,
         nodeType: "e2-medium",
         pool: "demo-pool",
         cpuCores: 2,
         ramBytes: 4294967296,
-        cpuCoreHours: 336,
-        ramByteHours: 1441151880806.4,
+        cpuCoreHours: scaleCost(336, days),
+        ramByteHours: scaleCost(1441151880806.4, days),
         GPUHours: 0,
         cpuBreakdown: { idle: 0.62, other: 0.03, system: 0.12, user: 0.23 },
         ramBreakdown: { idle: 0.45, other: 0.05, system: 0.18, user: 0.32 },
         preemptible: 0,
         discount: 0.3,
-        cpuCost: 8.42,
+        cpuCost: scaleCost(8.42, days),
         gpuCost: 0,
         gpuCount: 0,
-        ramCost: 4.18,
-        adjustment: -0.25,
-        totalCost: 12.35,
+        ramCost: scaleCost(4.18, days),
+        adjustment: scaleCost(-0.25, days),
+        totalCost: scaleCost(12.35, days),
         overhead: {
           cpuOverheadFraction: 0.06,
           ramOverheadFraction: 0.09,
           overheadCostFraction: 0.075,
         },
-        dailyCosts: generateDailySnapshots(12.35, days, startD, {
-          cpuCost: 8.42,
-          ramCost: 4.18,
-        }),
+        dailyCosts: generateDailySnapshots(
+          scaleCost(12.35, days),
+          days,
+          startD,
+          {
+            cpuCost: scaleCost(8.42, days),
+            ramCost: scaleCost(4.18, days),
+          },
+        ),
       },
     "GCP/__undefined__/demo-project/Compute/demo-cluster/Node/Kubernetes/gke-demo-pool-e5f6g7h8-a3b4/gke-demo-pool-e5f6g7h8-a3b4":
       {
@@ -121,33 +217,38 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
+        minutes,
         nodeType: "e2-standard-4",
         pool: "demo-pool",
         cpuCores: 4,
         ramBytes: 17179869184,
-        cpuCoreHours: 672,
-        ramByteHours: 5764607523034.112,
+        cpuCoreHours: scaleCost(672, days),
+        ramByteHours: scaleCost(5764607523034.112, days),
         GPUHours: 0,
         cpuBreakdown: { idle: 0.35, other: 0.05, system: 0.15, user: 0.45 },
         ramBreakdown: { idle: 0.28, other: 0.02, system: 0.2, user: 0.5 },
         preemptible: 0,
         discount: 0.3,
-        cpuCost: 16.84,
+        cpuCost: scaleCost(16.84, days),
         gpuCost: 0,
         gpuCount: 0,
-        ramCost: 16.72,
-        adjustment: -0.5,
-        totalCost: 33.06,
+        ramCost: scaleCost(16.72, days),
+        adjustment: scaleCost(-0.5, days),
+        totalCost: scaleCost(33.06, days),
         overhead: {
           cpuOverheadFraction: 0.04,
           ramOverheadFraction: 0.07,
           overheadCostFraction: 0.055,
         },
-        dailyCosts: generateDailySnapshots(33.06, days, startD, {
-          cpuCost: 16.84,
-          ramCost: 16.72,
-        }),
+        dailyCosts: generateDailySnapshots(
+          scaleCost(33.06, days),
+          days,
+          startD,
+          {
+            cpuCost: scaleCost(16.84, days),
+            ramCost: scaleCost(16.72, days),
+          },
+        ),
       },
     "AWS/__undefined__/prod-account/Compute/prod-cluster/Node/Kubernetes/ip-10-0-1-42.ec2.internal/ip-10-0-1-42.ec2.internal":
       {
@@ -173,33 +274,38 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
+        minutes,
         nodeType: "m5.xlarge",
         pool: "prod-workers",
         cpuCores: 4,
         ramBytes: 17179869184,
-        cpuCoreHours: 672,
-        ramByteHours: 5764607523034.112,
+        cpuCoreHours: scaleCost(672, days),
+        ramByteHours: scaleCost(5764607523034.112, days),
         GPUHours: 0,
         cpuBreakdown: { idle: 0.2, other: 0.05, system: 0.1, user: 0.65 },
         ramBreakdown: { idle: 0.15, other: 0.05, system: 0.1, user: 0.7 },
         preemptible: 0,
         discount: 0,
-        cpuCost: 22.68,
+        cpuCost: scaleCost(22.68, days),
         gpuCost: 0,
         gpuCount: 0,
-        ramCost: 18.14,
+        ramCost: scaleCost(18.14, days),
         adjustment: 0,
-        totalCost: 40.82,
+        totalCost: scaleCost(40.82, days),
         overhead: {
           cpuOverheadFraction: 0.05,
           ramOverheadFraction: 0.08,
           overheadCostFraction: 0.065,
         },
-        dailyCosts: generateDailySnapshots(40.82, days, startD, {
-          cpuCost: 22.68,
-          ramCost: 18.14,
-        }),
+        dailyCosts: generateDailySnapshots(
+          scaleCost(40.82, days),
+          days,
+          startD,
+          {
+            cpuCost: scaleCost(22.68, days),
+            ramCost: scaleCost(18.14, days),
+          },
+        ),
       },
     "GCP/__undefined__/demo-project/Storage/demo-cluster/Disk/Kubernetes/pvc-abc123/pvc-abc123":
       {
@@ -217,20 +323,20 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
-        byteHours: 1443109011456,
+        minutes,
+        byteHours: scaleCost(1443109011456, days),
         bytes: 10737418240,
-        byteHoursUsed: 432932703436.8,
+        byteHoursUsed: scaleCost(432932703436.8, days),
         byteUsageMax: 3221225472,
         breakdown: { idle: 0.7, other: 0, system: 0.1, user: 0.2 },
         adjustment: 0,
-        totalCost: 1.47,
+        totalCost: scaleCost(1.47, days),
         storageClass: "standard-rwo",
         volumeName: "pvc-abc123",
         claimName: "prometheus-server",
         claimNamespace: "prometheus-system",
         local: 0,
-        dailyCosts: generateDailySnapshots(1.47, days, startD),
+        dailyCosts: generateDailySnapshots(scaleCost(1.47, days), days, startD),
       },
     "GCP/__undefined__/demo-project/Storage/demo-cluster/Disk/Kubernetes/pvc-def456/pvc-def456":
       {
@@ -248,20 +354,20 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
-        byteHours: 5772436045824,
+        minutes,
+        byteHours: scaleCost(5772436045824, days),
         bytes: 53687091200,
-        byteHoursUsed: 2886218022912,
+        byteHoursUsed: scaleCost(2886218022912, days),
         byteUsageMax: 26843545600,
         breakdown: { idle: 0.5, other: 0, system: 0, user: 0.5 },
         adjustment: 0,
-        totalCost: 5.88,
+        totalCost: scaleCost(5.88, days),
         storageClass: "pd-ssd",
         volumeName: "pvc-def456",
         claimName: "data-postgres-0",
         claimNamespace: "database",
         local: 0,
-        dailyCosts: generateDailySnapshots(5.88, days, startD),
+        dailyCosts: generateDailySnapshots(scaleCost(5.88, days), days, startD),
       },
     "AWS/__undefined__/prod-account/Network/prod-cluster/LoadBalancer/Kubernetes/ab1234-elb/ab1234-elb":
       {
@@ -279,12 +385,16 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
+        minutes,
         adjustment: 0,
-        totalCost: 18.14,
+        totalCost: scaleCost(18.14, days),
         private: false,
         ip: "52.14.23.189",
-        dailyCosts: generateDailySnapshots(18.14, days, startD),
+        dailyCosts: generateDailySnapshots(
+          scaleCost(18.14, days),
+          days,
+          startD,
+        ),
       },
     "GCP/__undefined__/demo-project/Network/demo-cluster/Network/Kubernetes/__unmounted__/__unmounted__":
       {
@@ -302,10 +412,10 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
+        minutes,
         adjustment: 0,
-        totalCost: 2.34,
-        dailyCosts: generateDailySnapshots(2.34, days, startD),
+        totalCost: scaleCost(2.34, days),
+        dailyCosts: generateDailySnapshots(scaleCost(2.34, days), days, startD),
       },
     "GCP/__undefined__/demo-project/Management/demo-cluster/ClusterManagement/Kubernetes/demo-cluster/demo-cluster":
       {
@@ -323,10 +433,14 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
+        minutes,
         adjustment: 0,
-        totalCost: 24.36,
-        dailyCosts: generateDailySnapshots(24.36, days, startD),
+        totalCost: scaleCost(24.36, days),
+        dailyCosts: generateDailySnapshots(
+          scaleCost(24.36, days),
+          days,
+          startD,
+        ),
       },
     "AWS/__undefined__/prod-account/Other/prod-cluster/Cloud/AWS/nat-gateway-prod/nat-gateway-prod":
       {
@@ -344,11 +458,11 @@ function getMockAssets() {
         window: { start: winStart, end: winEnd },
         start: winStart,
         end: winEnd,
-        minutes: 10080,
+        minutes,
         adjustment: 0,
-        credit: -1.25,
-        totalCost: 6.72,
-        dailyCosts: generateDailySnapshots(6.72, days, startD),
+        credit: scaleCost(-1.25, days),
+        totalCost: scaleCost(6.72, days),
+        dailyCosts: generateDailySnapshots(scaleCost(6.72, days), days, startD),
       },
   };
 }
@@ -371,7 +485,7 @@ class AssetsService {
         error.message,
       );
       return {
-        data: { code: 200, data: [getMockAssets()] },
+        data: { code: 200, data: [getMockAssets(win)] },
         isMock: true,
       };
     }

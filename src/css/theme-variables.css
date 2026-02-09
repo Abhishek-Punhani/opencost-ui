@@ -110,6 +110,23 @@ body,
   color: var(--text-primary);
 }
 
+/* ── MUI Paper (cards, panels, modals) ── */
+[data-theme="dark"] .MuiPaper-root {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+  background-image: none !important; /* remove MUI elevation gradient overlay */
+}
+
+/* ── MUI Typography ── */
+[data-theme="dark"] .MuiTypography-root {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .MuiTypography-colorTextSecondary {
+  color: var(--text-secondary) !important;
+}
+
 /* Better contrast for headings in dark mode */
 [data-theme="dark"] h1,
 [data-theme="dark"] h2,
@@ -122,6 +139,174 @@ body,
   letter-spacing: -0.02em;
 }
 
+/* ── MUI Buttons & IconButtons ── */
+[data-theme="dark"] .MuiButton-root {
+  color: var(--text-primary);
+  border-color: var(--border-color) !important;
+}
+[data-theme="dark"] .MuiButton-contained {
+  background-color: var(--accent-primary) !important;
+  color: #fff !important;
+}
+[data-theme="dark"] .MuiButton-outlined {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .MuiButton-outlined:hover {
+  background-color: var(--bg-hover) !important;
+  border-color: var(--border-hover) !important;
+}
+[data-theme="dark"] .MuiIconButton-root {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .MuiIconButton-root:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+/* ── MUI Table ── */
+[data-theme="dark"] .MuiTable-root {
+  background-color: var(--card-bg);
+}
+[data-theme="dark"] .MuiTableCell-root {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+[data-theme="dark"] .MuiTableCell-head {
+  background-color: var(--table-header-bg) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+}
+[data-theme="dark"] .MuiTableRow-root:hover {
+  background-color: var(--table-row-hover) !important;
+}
+
+/* ── MUI List ── */
+[data-theme="dark"] .MuiList-root {
+  background-color: transparent;
+}
+[data-theme="dark"] .MuiListItem-root {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .MuiListItem-root:hover {
+  background-color: var(--bg-hover) !important;
+}
+[data-theme="dark"] .MuiListItemIcon-root {
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .MuiListItemText-secondary {
+  color: var(--text-tertiary) !important;
+}
+
+/* ── MUI Checkbox & inputs ── */
+[data-theme="dark"] .MuiCheckbox-root {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .MuiCheckbox-root.Mui-checked {
+  color: var(--accent-primary) !important;
+}
+[data-theme="dark"] .MuiInputBase-root {
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .MuiOutlinedInput-notchedOutline {
+  border-color: var(--border-color) !important;
+}
+[data-theme="dark"] .MuiInputLabel-root {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .MuiSelect-icon {
+  color: var(--text-secondary) !important;
+}
+
+/* ── MUI Modal & Dialog ── */
+[data-theme="dark"] .MuiModal-root .MuiBackdrop-root {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+[data-theme="dark"] .MuiDialog-paper {
+  background-color: var(--card-bg) !important;
+}
+
+/* ── MUI Tabs ── */
+[data-theme="dark"] .MuiTab-root {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .MuiTab-root.Mui-selected {
+  color: var(--accent-primary) !important;
+}
+[data-theme="dark"] .MuiTabs-indicator {
+  background-color: var(--accent-primary) !important;
+}
+
+/* ── MUI Breadcrumbs ── */
+[data-theme="dark"] .MuiBreadcrumbs-root {
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .MuiBreadcrumbs-separator {
+  color: var(--text-tertiary);
+}
+
+/* ── MUI Tooltip ── */
+[data-theme="dark"] .MuiTooltip-tooltip {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color);
+}
+
+/* ── MUI CircularProgress ── */
+[data-theme="dark"] .MuiCircularProgress-root {
+  color: var(--accent-primary) !important;
+}
+
+/* ── MUI Popover & Menu ── */
+[data-theme="dark"] .MuiPopover-paper {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+}
+[data-theme="dark"] .MuiMenu-paper {
+  background-color: var(--card-bg) !important;
+}
+[data-theme="dark"] .MuiMenuItem-root {
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .MuiMenuItem-root:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+/* ── MUI Link ── */
+[data-theme="dark"] .MuiLink-root {
+  color: var(--accent-primary) !important;
+}
+
+/* ── MUI Chip ── */
+[data-theme="dark"] .MuiChip-root {
+  background-color: var(--button-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ── MUI Warning icon ── */
+[data-theme="dark"] .MuiSvgIcon-root {
+  color: inherit;
+}
+
+/* ── Recharts (used across all pages) ── */
+[data-theme="dark"] .recharts-cartesian-grid line {
+  stroke: var(--chart-grid);
+}
+[data-theme="dark"] .recharts-text {
+  fill: var(--chart-text);
+}
+[data-theme="dark"] .recharts-default-tooltip {
+  background-color: var(--chart-tooltip-bg) !important;
+  border-color: var(--chart-tooltip-border) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .recharts-tooltip-item {
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .recharts-legend-item-text {
+  color: var(--text-secondary) !important;
+}
+
 /* Sidebar improvements for dark mode */
 [data-theme="dark"] .MuiDrawer-paper {
   background-color: var(--sidebar-bg) !important;
@@ -132,15 +317,13 @@ body,
   filter: brightness(0.9);
 }
 
-[data-theme="dark"] .MuiListItem-root {
-  color: var(--text-primary);
-}
-
 /* Input and select improvements */
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
   color: var(--text-primary);
+  background-color: var(--button-bg);
+  border-color: var(--border-color);
 }
 
 [data-theme="dark"] input::placeholder,

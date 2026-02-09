@@ -207,18 +207,14 @@ const ExternalCosts = () => {
     setSortDirection(searchParams.get("sortDirection") || "desc");
   }, [routerLocation]);
 
-  // Initialize once, then fetch report each time setFetch(true) is called
+  // Initialize on mount
   React.useEffect(() => {
-    if (!init) {
-      initialize();
-    }
-    if (init || fetch) {
-      fetchData();
-    }
-  }, [init, fetch]);
+    if (!init) initialize();
+  }, []);
 
+  // Fetch data whenever query parameters change
   React.useEffect(() => {
-    setFetch(!fetch);
+    fetchData();
   }, [window, aggregateBy, filters, costType, sortBy, sortDirection]);
 
   return (
@@ -227,7 +223,7 @@ const ExternalCosts = () => {
       <Header headerTitle="External Costs">
         <IconButton
           aria-label="refresh"
-          onClick={() => setFetch(true)}
+          onClick={() => fetchData()}
           style={{ padding: 12 }}
         >
           <RefreshIcon />
@@ -240,7 +236,14 @@ const ExternalCosts = () => {
       )}
       {init && (
         <Paper id="cloud-cost">
-          <div style={{ display: "flex", flexFlow: "row", padding: 24 }}>
+          <div
+            style={{
+              display: "flex",
+              flexFlow: "row wrap",
+              padding: 24,
+              gap: 16,
+            }}
+          >
             <ExternalCostsControls
               costType={costType}
               setCostType={(type) => {
@@ -314,4 +317,4 @@ const ExternalCosts = () => {
   );
 };
 
-export default React.memo(ExternalCosts);
+export default ExternalCosts;

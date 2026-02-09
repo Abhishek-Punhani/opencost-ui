@@ -72,7 +72,7 @@ function exportAssetsCSV(assets, currency) {
 
 const REFRESH_INTERVAL = 60000; // 60 seconds
 
-const Assets = React.memo(() => {
+const Assets = () => {
   const routerLocation = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(routerLocation.search);
@@ -422,6 +422,6 @@ const Assets = React.memo(() => {
       <Footer />
     </Page>
   );
-});
+};
 
 export default Assets;
